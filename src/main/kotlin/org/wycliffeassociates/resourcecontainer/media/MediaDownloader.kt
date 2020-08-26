@@ -21,7 +21,7 @@ class MediaDownloader(private val rcPath: File) {
 
         if (mediaProject != null) {
             val updatedMedia = downloadProjectMedia(mediaProject.identifier, mediaProject.media)
-            //mediaProject.media = updatedMedia
+            mediaProject.media = updatedMedia
         }
 
         return rcPath
@@ -35,9 +35,9 @@ class MediaDownloader(private val rcPath: File) {
 
             val downloadedFile = downloadFromStream(url, contentDir)
             if (downloadedFile != null) {
-                val pathInRC = "media/$projectId"
+                val pathInRC = "media/$projectId/${downloadedFile.name}"
                 rc.addFileToContainer(downloadedFile, pathInRC)
-                media.url = pathInRC + "/" + downloadedFile.name
+                media.url = pathInRC
             }
             // update url
         }
