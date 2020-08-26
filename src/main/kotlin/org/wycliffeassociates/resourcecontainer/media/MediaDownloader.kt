@@ -9,56 +9,58 @@ import java.io.IOException
 import java.net.URL
 
 
-class MediaDownloader() {
-    companion object {
-        const val outputDir = "./media/"
+class MediaDownloader(private val rcPath: File) {
+    val outputDir = "./media/"
+    private val rc = ResourceContainer.load(rcPath)
 
-        fun download(rcFile: File, urlParams: MediaUrlParameter): File {
-            val rc = ResourceContainer.load(rcFile)
-            val project = urlParams.projectId
-            val chapter = urlParams.chapter
-            val mediaType = urlParams.mediaTypes[0] // test with 1st type
+    fun download(urlParams: MediaUrlParameter): File {
+        val project = urlParams.projectId
+//        val chapter = urlParams.chapter
 
-            val mediaProject = rc.media?.projects?.firstOrNull { it.identifier == project }
+        val mediaProject = rc.media?.projects?.firstOrNull { it.identifier == project }
 
-            if (mediaProject != null){
-                downloadMedia(mediaProject.media)
-            }
-
-            return rcFile
+        if (mediaProject != null) {
+            val updatedMedia = downloadProjectMedia(mediaProject.identifier, mediaProject.media)
+            //mediaProject.media = updatedMedia
         }
 
-        private fun downloadMedia(mediaList: List<Media>) {
-            val contentDir = File("S:/Misc/download") // path in RC
-            for (media in mediaList) {
-                val url = media.url.replace("{latest}", "12")
-                val fileName = File(url).name
-                val outputFile = contentDir.resolve(fileName)
+        return rcPath
+    }
 
-                // download file to RC
-                downloadFromStream(url, outputFile)
+    private fun downloadProjectMedia(projectId: String, mediaList: List<Media>): List<Media> {
+        val contentDir = File("E:/miscs/download").apply { mkdir() } // temp download
 
+        for (media in mediaList) {
+            val url = media.url.replace("{latest}", "12") // replace url template variables
 
-                // update url
-
+            val downloadedFile = downloadFromStream(url, contentDir)
+            if (downloadedFile != null) {
+                val pathInRC = "media/$projectId"
+                rc.addFileToContainer(downloadedFile, pathInRC)
+                media.url = pathInRC + "/" + downloadedFile.name
             }
+            // update url
         }
 
-        private fun downloadFromStream(url: String, outputFile: File): File? {
-            try {
-                BufferedInputStream(URL(url).openStream()).use { inputStream ->
-                    val bytes = inputStream.readBytes()
+        return mediaList
+    }
 
-                    FileOutputStream(outputFile).use { outputStream ->
-                        outputStream.write(bytes)
-                    }
-                    println(outputFile)
-                    return outputFile
+    private fun downloadFromStream(url: String, outputDir: File): File? {
+        val fileName = File(url).name
+        val outputFile = outputDir.resolve(fileName)
+
+        try {
+            BufferedInputStream(URL(url).openStream()).use { inputStream ->
+                val bytesReceived = inputStream.readBytes()
+
+                FileOutputStream(outputFile).buffered().use { outputStream ->
+                    outputStream.write(bytesReceived)
                 }
-            } catch (e: IOException) {
-                println(e.message)
-                return null
+                return outputFile
             }
+        } catch (e: IOException) {
+            println(e.message)
+            return null
         }
     }
 }
