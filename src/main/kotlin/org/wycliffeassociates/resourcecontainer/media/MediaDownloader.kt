@@ -28,7 +28,8 @@ class MediaDownloader(private val rcPath: File) {
     }
 
     private fun downloadProjectMedia(projectId: String, mediaList: List<Media>): List<Media> {
-        val contentDir = File("E:/miscs/download").apply { mkdir() } // temp download
+        val contentDir = createTempDir()
+        contentDir.deleteOnExit()
 
         for (media in mediaList) {
             val url = media.url.replace("{latest}", "12") // replace url template variables
