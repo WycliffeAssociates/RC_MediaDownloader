@@ -10,6 +10,8 @@ import java.net.URL
 
 
 class MediaDownloader private constructor(private val rcFile: File) {
+    val outputDir = "./media/"
+    private val rc = ResourceContainer.load(rcFile)
 
     companion object {
         fun download(rcFile: File, urlParams: MediaUrlParameter): File {
@@ -18,10 +20,7 @@ class MediaDownloader private constructor(private val rcFile: File) {
         }
     }
 
-    val outputDir = "./media/"
-    private val rc = ResourceContainer.load(rcFile)
-
-    fun download(urlParams: MediaUrlParameter): File {
+    private fun download(urlParams: MediaUrlParameter): File {
         val project = urlParams.projectId
 //        val chapter = urlParams.chapter
 
@@ -31,7 +30,7 @@ class MediaDownloader private constructor(private val rcFile: File) {
             val updatedMedia = downloadProjectMedia(mediaProject.identifier, mediaProject.media)
             mediaProject.media = updatedMedia
         }
-
+        rc.writeMedia()
         return rcFile
     }
 
