@@ -9,9 +9,17 @@ import java.io.IOException
 import java.net.URL
 
 
-class MediaDownloader(private val rcPath: File) {
+class MediaDownloader private constructor(private val rcFile: File) {
+
+    companion object {
+        fun download(rcFile: File, urlParams: MediaUrlParameter): File {
+            val downloader = MediaDownloader(rcFile)
+            return downloader.download(urlParams)
+        }
+    }
+
     val outputDir = "./media/"
-    private val rc = ResourceContainer.load(rcPath)
+    private val rc = ResourceContainer.load(rcFile)
 
     fun download(urlParams: MediaUrlParameter): File {
         val project = urlParams.projectId
@@ -24,7 +32,7 @@ class MediaDownloader(private val rcPath: File) {
             mediaProject.media = updatedMedia
         }
 
-        return rcPath
+        return rcFile
     }
 
     private fun downloadProjectMedia(projectId: String, mediaList: List<Media>): List<Media> {

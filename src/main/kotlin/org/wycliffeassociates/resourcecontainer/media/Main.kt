@@ -8,5 +8,5 @@ fun main() {
         projectId = "gen",
         mediaTypes = listOf(MediaType.WAV)
     )
-    MediaDownloader(rcFile).download(parameter)
+    MediaDownloader.download(rcFile, parameter)
 }
