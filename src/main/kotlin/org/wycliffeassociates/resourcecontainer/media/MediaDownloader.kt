@@ -9,45 +9,54 @@ import java.io.IOException
 import java.net.URL
 
 
-class MediaDownloader private constructor(private val rcFile: File) {
-    val outputDir = "./media/"
+class MediaDownloader private constructor(
+        rcFile: File,
+        private val urlParams: MediaUrlParameter
+) {
+    private val mediaDir = "media"
     private val rc = ResourceContainer.load(rcFile)
 
     companion object {
         fun download(rcFile: File, urlParams: MediaUrlParameter): File {
-            val downloader = MediaDownloader(rcFile)
-            return downloader.download(urlParams)
+            val downloader = MediaDownloader(rcFile, urlParams)
+            return downloader.download()
         }
     }
 
-    private fun download(urlParams: MediaUrlParameter): File {
-        val project = urlParams.projectId
-//        val chapter = urlParams.chapter
-
-        val mediaProject = rc.media?.projects?.firstOrNull { it.identifier == project }
+    private fun download(): File {
+        val mediaProject = rc.media?.projects?.firstOrNull {
+            it.identifier == urlParams.projectId
+        }
 
         if (mediaProject != null) {
-            val updatedMedia = downloadProjectMedia(mediaProject.identifier, mediaProject.media)
+            val updatedMedia =
+                    downloadProjectMedia(mediaProject.identifier, mediaProject.media)
             mediaProject.media = updatedMedia
         }
         rc.writeMedia()
-        return rcFile
+        return File("")
     }
 
-    private fun downloadProjectMedia(projectId: String, mediaList: List<Media>): List<Media> {
-        val contentDir = createTempDir()
-        contentDir.deleteOnExit()
+    private fun downloadProjectMedia(
+            projectId: String,
+            mediaList: List<Media>,
+            mediaTypes: List<MediaType> = listOf()
+    ): List<Media> {
+        val contentDir = createTempDir().apply { deleteOnExit() }
 
         for (media in mediaList) {
             val url = media.url.replace("{latest}", "12") // replace url template variables
 
             val downloadedFile = downloadFromStream(url, contentDir)
             if (downloadedFile != null) {
-                val pathInRC = "media/$projectId/${downloadedFile.name}"
+                val pathInRC = "$mediaDir/$projectId/${downloadedFile.name}"
+                val templatePath = templatePathInRC(
+                        downloadedFile.nameWithoutExtension,
+                        isChapter = media.chapterUrl.isNotEmpty()
+                )
                 rc.addFileToContainer(downloadedFile, pathInRC)
                 media.url = pathInRC
             }
-            // update url
         }
 
         return mediaList
@@ -69,6 +78,25 @@ class MediaDownloader private constructor(private val rcFile: File) {
         } catch (e: IOException) {
             println(e.message)
             return null
+        }
+    }
+
+    @Throws(IllegalArgumentException::class)
+    private fun templatePathInRC(
+            fileNameNoExt: String,
+            isChapter: Boolean,
+            isProject: Boolean = true
+    ): String {
+        return when {
+            isChapter -> {
+                val rx = Regex("_c[0-9]{1,3}")
+                val chapterSlug = rx.find(fileNameNoExt)?.value
+                        ?: throw IllegalArgumentException("Corrupted file name")
+                val templatedFileName = fileNameNoExt.replace(chapterSlug, "_c{chapter}")
+                "$mediaDir/{project}/chapters/$templatedFileName.{mediaType}"
+            }
+            isProject -> "$mediaDir/{project}/$fileNameNoExt.{mediaType}"
+            else -> "$mediaDir/$fileNameNoExt.{mediaType}"
         }
     }
 }
