@@ -72,3 +72,15 @@ class MediaDownloader private constructor(private val rcFile: File) {
         }
     }
 }
+
+fun main() {
+
+    val rcFile = File("/home/dj/Downloads/en_ulb.zip")
+    val parameter = MediaUrlParameter(
+        projectId = "gen",
+        mediaTypes = listOf(MediaType.WAV)
+    )
+
+    val download = MediaDownloader.download(rcFile, parameter)
+
+}
