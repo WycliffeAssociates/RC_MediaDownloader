@@ -3,5 +3,5 @@ package org.wycliffeassociates.resourcecontainer.media
 data class MediaUrlParameter(
     val projectId: String,
     val mediaTypes: List<MediaType>,
-    val chapter: Int? = null
+    val isChaptersDownload: Boolean = false
 )
