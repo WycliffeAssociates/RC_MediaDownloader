@@ -1,4 +1,6 @@
-package org.wycliffeassociates.resourcecontainer.media
+package org.wycliffeassociates.resourcecontainer.media.data
+
+import org.wycliffeassociates.resourcecontainer.media.data.MediaType
 
 data class MediaUrlParameter(
     val projectId: String,

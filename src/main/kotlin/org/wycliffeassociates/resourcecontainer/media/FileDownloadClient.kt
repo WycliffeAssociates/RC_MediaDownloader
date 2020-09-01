@@ -7,7 +7,6 @@ import retrofit2.http.Streaming
 import retrofit2.http.Url
 
 interface FileDownloadClient {
-    @Streaming
     @GET
-    fun downloadFileStream(@Url url: String): Call<ResponseBody>
+    fun downloadFile(@Url url: String): Call<ResponseBody>
 }
