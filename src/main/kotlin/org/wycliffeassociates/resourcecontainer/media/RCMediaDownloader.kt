@@ -40,21 +40,19 @@ class RCMediaDownloader private constructor(
     private fun execute(): File {
         val mediaProject = rc.media?.projects?.firstOrNull {
             it.identifier == urlParams.projectId
-        }
+        } ?: return rcOutputFile
 
-        if (mediaProject != null) {
-            for (mediaType in urlParams.mediaTypes) {
-                // filter mediaType to download
-                val media = mediaProject.media.firstOrNull {
-                    it.identifier == mediaType.name.toLowerCase()
-                }
+        for (mediaType in urlParams.mediaTypes) {
+            // filter mediaType to download
+            val media = mediaProject.media.firstOrNull {
+                it.identifier == mediaType.name.toLowerCase()
+            }
 
-                if (media != null) {
-                    if (urlParams.isChaptersDownload) {
-                        media.chapterUrl = downloadChaptersMedia(media.chapterUrl)
-                    } else {
-                        media.url = downloadProjectMedia(media.url)
-                    }
+            if (media != null) {
+                if (urlParams.isChaptersDownload) {
+                    media.chapterUrl = downloadChaptersMedia(media.chapterUrl)
+                } else {
+                    media.url = downloadProjectMedia(media.url)
                 }
             }
         }
@@ -63,7 +61,6 @@ class RCMediaDownloader private constructor(
         return rcOutputFile
     }
 
-    // download a project
     private fun downloadProjectMedia(url: String): String {
         val contentDir = createTempDir().apply { deleteOnExit() }
 
@@ -79,7 +76,6 @@ class RCMediaDownloader private constructor(
         )
     }
 
-    // download all chapters
     private fun downloadChaptersMedia(url: String): String {
         val contentDir = createTempDir().apply { deleteOnExit() }
         val filesToRCMap = mutableMapOf<String, File>()
@@ -94,9 +90,8 @@ class RCMediaDownloader private constructor(
         chapterUrlList.parallelStream().forEach { downloadUrl ->
             val downloadedFile = downloadWithClient(downloadUrl, contentDir)
             if (downloadedFile != null) {
-                // add file to container
                 val pathInRC = "$MEDIA_DIR/${urlParams.projectId}/chapters/${downloadedFile.name}"
-                filesToRCMap[pathInRC] = downloadedFile
+                filesToRCMap[pathInRC] = downloadedFile // save File to map for later multiple addition
             }
         }
         rc.addFilesToContainer(filesToRCMap)
@@ -118,6 +113,7 @@ class RCMediaDownloader private constructor(
 
         val call = downloader.downloadFile(urlFile.name)
         val response = call.execute()
+
         if (response.isSuccessful) {
             val body = response.body()
             if (body == null) {
