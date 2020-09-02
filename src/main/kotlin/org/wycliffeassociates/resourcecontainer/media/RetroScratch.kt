@@ -1,16 +1,15 @@
 package org.wycliffeassociates.resourcecontainer.media
 
+import java.io.BufferedInputStream
+import java.io.File
+import java.io.FileOutputStream
 import okhttp3.ResponseBody
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 import retrofit2.Retrofit
-import java.io.BufferedInputStream
-import java.io.File
-import java.io.FileOutputStream
 
-class RetroScratch {
-}
+class RetroScratch
 
 fun main() {
     val retrofitService = Retrofit.Builder()
@@ -20,13 +19,13 @@ fun main() {
 
     val call = downloader.downloadFileStream("en/ulb/tit/1/CONTENTS/mp3/hi/chapter/en_nt_ulb_tit_c01.mp3")
 
-    call.enqueue(object: Callback<ResponseBody> {
+    call.enqueue(object : Callback<ResponseBody> {
         override fun onResponse(call: Call<ResponseBody>, response: Response<ResponseBody>) {
             if (response.isSuccessful) {
                 println("success")
 
                 val body = response.body()
-                if(body == null) {
+                if (body == null) {
                     println("body is null")
                 } else {
                     writeResponseBodyToDisk(body)

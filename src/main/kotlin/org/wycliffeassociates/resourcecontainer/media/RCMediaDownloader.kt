@@ -1,13 +1,12 @@
 package org.wycliffeassociates.resourcecontainer.media
 
+import java.io.BufferedInputStream
+import java.io.File
+import java.io.FileOutputStream
 import okhttp3.ResponseBody
 import org.wycliffeassociates.resourcecontainer.ResourceContainer
 import org.wycliffeassociates.resourcecontainer.media.data.MediaUrlParameter
 import retrofit2.Retrofit
-import java.io.BufferedInputStream
-import java.io.File
-import java.io.FileOutputStream
-
 
 class RCMediaDownloader private constructor(
     rcFile: File,
