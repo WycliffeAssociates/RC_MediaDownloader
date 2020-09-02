@@ -1,0 +1,5 @@
+ext {
+    kotlin_ver = '1.3.72'
+    ktlint_ver = '9.2.1'
+    detekt_ver = '1.10.0-RC1'
+}
