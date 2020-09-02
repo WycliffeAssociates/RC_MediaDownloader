@@ -84,8 +84,9 @@ class RCMediaDownloader private constructor(
         val contentDir = createTempDir().apply { deleteOnExit() }
         val filesToRCMap = mutableMapOf<String, File>()
         val chapterUrlList = mutableListOf<String>()
+        val possibleChapterRange = 200
 
-        for (chapterNumber in 1..200) {
+        for (chapterNumber in 1..possibleChapterRange) {
             val chapterUrl = url.replace("{chapter}", chapterNumber.toString())
             chapterUrlList.add(chapterUrl)
         }
