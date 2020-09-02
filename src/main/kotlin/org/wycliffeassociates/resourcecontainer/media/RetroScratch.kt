@@ -17,7 +17,7 @@ fun main() {
             .build()
     val downloader: FileDownloadClient = retrofitService.create(FileDownloadClient::class.java)
 
-    val call = downloader.downloadFileStream("en/ulb/tit/1/CONTENTS/mp3/hi/chapter/en_nt_ulb_tit_c01.mp3")
+    val call = downloader.downloadFile("en/ulb/tit/1/CONTENTS/mp3/hi/chapter/en_nt_ulb_tit_c01.mp3")
 
     call.enqueue(object : Callback<ResponseBody> {
         override fun onResponse(call: Call<ResponseBody>, response: Response<ResponseBody>) {
