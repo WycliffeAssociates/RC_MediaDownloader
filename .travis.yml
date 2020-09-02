@@ -1,0 +1,20 @@
+language: java
+dist: bionic
+jdk:
+- openjdk11
+before_cache:
+- rm -f $HOME/.gradle/caches/modules-2/modules-2.lock
+- rm -f $HOME/.gradle/caches/*/plugin-resoloution/
+cache:
+  directories:
+  - "$HOME/.gradle/caches/"
+  - "$HOME/.gradle/wrapper"
+  - "$HOME/.sonar/cache"
+script:
+- "./gradlew check build"
+- sonar-scanner
+addons:
+  sonarcloud:
+    organization: wycliffeassociates
+    token:
+      secure: "clVkWaAsivoXEHF7lsEipBsvxMDFs1iD0tmyt0fQb04j09lXsf+m3+03kwcPYTs/XLLR8VcK+ACJHChkhJHU8NH7keyAXrrDzoGejOE+/7IsnIJoIqyKy8nZHCm9Q9ekWL6bPaGb313zbIDpcf05XtWa+KMBV/x7EFkmjSv9xKl3GOiImwHFXTp/fo6Xhz2iGfcMse77pbd0SZkbgB0hTIbFPm1OCS1Lj5PWvxT4oa64nFwOuzTfclvpvOYxbCxUUIF5md4P8Ajs6uCijh4B39VHe/d2KVgNl1i0Q0Z9e/LQ/y4fmwAAThDW0feWdRBMbCGLPivxgLKISNtdwfpfz3anmxAGYxJFVl6JwIU6r3B18eCOd1fTqEQN9PYhz8bLi1VTHV/CzB9XrUxXPNu/jyXJNIqp3GlfJB7OH89Lq4AhTl4rCPagdAmHExNqBCP63AH+LvF+NN8SU+kbv3xqeuSZ9nd9th5Yx7W0TEuAGHIDgIoBBTJZ/+cP+iRKX7pX3hDMeF80YGXl/ufarWbQShczL+F4BR3Tjh8liHlwotxoN28J8bNasYpzhCNmaLFrmII+XzgT/DsL32eY6bH/UO4/VdhGKzJB2GB2OubVuHIljwWLcYj6ZZYzbA3xNiptp5EN+vYtOVH2/0x1kBkwMOcr08vZOaR70WQp40jI5rQ="
