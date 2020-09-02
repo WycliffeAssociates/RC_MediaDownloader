@@ -1,12 +1,9 @@
 package org.wycliffeassociates.resourcecontainer.media
 
-import java.io.BufferedInputStream
 import java.io.File
-import java.io.FileOutputStream
-import okhttp3.ResponseBody
 import org.wycliffeassociates.resourcecontainer.ResourceContainer
 import org.wycliffeassociates.resourcecontainer.media.data.MediaUrlParameter
-import retrofit2.Retrofit
+import org.wycliffeassociates.resourcecontainer.media.io.DownloadClient
 
 class RCMediaDownloader private constructor(
     rcFile: File,
@@ -63,8 +60,8 @@ class RCMediaDownloader private constructor(
 
     private fun downloadProjectMedia(url: String): String {
         val contentDir = createTempDir().apply { deleteOnExit() }
+        val downloadedFile = DownloadClient.downloadFromUrl(url, contentDir)
 
-        val downloadedFile = downloadWithClient(url, contentDir)
         if (downloadedFile != null) {
             val pathInRC = "$MEDIA_DIR/${urlParams.projectId}/${downloadedFile.name}"
             rc.addFileToContainer(downloadedFile, pathInRC)
@@ -88,7 +85,8 @@ class RCMediaDownloader private constructor(
         }
 
         chapterUrlList.parallelStream().forEach { downloadUrl ->
-            val downloadedFile = downloadWithClient(downloadUrl, contentDir)
+            val downloadedFile = DownloadClient.downloadFromUrl(downloadUrl, contentDir)
+
             if (downloadedFile != null) {
                 val pathInRC = "$MEDIA_DIR/${urlParams.projectId}/chapters/${downloadedFile.name}"
                 filesToRCMap[pathInRC] = downloadedFile // save File to map for later multiple addition
@@ -102,30 +100,6 @@ class RCMediaDownloader private constructor(
         )
     }
 
-    private fun downloadWithClient(url: String, outputDir: File): File? {
-        val urlFile = File(url)
-        val outputFile = outputDir.resolve(urlFile.name)
-
-        val retrofitService = Retrofit.Builder()
-            .baseUrl(urlFile.parentFile.invariantSeparatorsPath + "/")
-            .build()
-        val downloader: FileDownloadClient = retrofitService.create(FileDownloadClient::class.java)
-
-        val call = downloader.downloadFile(urlFile.name)
-        val response = call.execute()
-
-        if (response.isSuccessful) {
-            val body = response.body()
-            if (body == null) {
-                println("content not found")
-            } else {
-                writeTempDownload(body, outputFile)
-            }
-        }
-
-        return if (outputFile.isFile) outputFile else null
-    }
-
     private fun templatePathInRC(
         fileName: String,
         isChapter: Boolean
@@ -135,16 +109,5 @@ class RCMediaDownloader private constructor(
         } else {
             "$MEDIA_DIR/${urlParams.projectId}/$fileName"
         }
-    }
-
-    private fun writeTempDownload(body: ResponseBody, outputFile: File): File {
-        BufferedInputStream(body.byteStream()).use { inputStream ->
-            val bytes = inputStream.readBytes()
-
-            FileOutputStream(outputFile).buffered().use { outputStream ->
-                outputStream.write(bytes)
-            }
-        }
-        return outputFile
     }
 }
