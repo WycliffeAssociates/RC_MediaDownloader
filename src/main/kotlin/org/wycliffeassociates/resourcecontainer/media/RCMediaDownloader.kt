@@ -47,7 +47,7 @@ class RCMediaDownloader private constructor(
 
             if (media != null) {
                 if (urlParams.isChaptersDownload) {
-                    media.chapterUrl = downloadChaptersMedia(media.chapterUrl)
+                    media.chapterUrl = downloadChapterMedia(media.chapterUrl)
                 } else {
                     media.url = downloadProjectMedia(media.url)
                 }
@@ -66,6 +66,7 @@ class RCMediaDownloader private constructor(
             val pathInRC = "$MEDIA_DIR/${urlParams.projectId}/${downloadedFile.name}"
             rc.addFileToContainer(downloadedFile, pathInRC)
         }
+        contentDir.deleteRecursively() // delete temp dir after downloaded
 
         return templatePathInRC(
             File(url).name,
@@ -73,8 +74,8 @@ class RCMediaDownloader private constructor(
         )
     }
 
-    private fun downloadChaptersMedia(url: String): String {
-        val contentDir = createTempDir().apply { deleteOnExit() }
+    private fun downloadChapterMedia(url: String): String {
+        val contentDir = createTempDir()
         val filesToRCMap = mutableMapOf<String, File>()
         val chapterUrlList = mutableListOf<String>()
         val possibleChapterRange = 200
@@ -93,6 +94,7 @@ class RCMediaDownloader private constructor(
             }
         }
         rc.addFilesToContainer(filesToRCMap)
+        contentDir.deleteRecursively() // delete temp dir after downloaded
 
         return templatePathInRC(
             File(url).name,
