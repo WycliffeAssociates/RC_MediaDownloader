@@ -15,7 +15,10 @@ plugins {
     id 'org.jetbrains.kotlin.jvm' version '1.3.72'
     id 'io.gitlab.arturbosch.detekt' version "$detekt_ver"
     id 'org.jlleitschuh.gradle.ktlint' version "$ktlint_ver"
+    id 'com.github.johnrengelman.shadow' version "$shadowjar_ver"
 }
+
+apply plugin: 'application'
 
 group 'org.wycliffeassociates'
 version '1.0-SNAPSHOT'
@@ -53,9 +56,16 @@ ktlint {
     ignoreFailures = true
 }
 
-allprojects {
-    repositories {
-        jcenter()
-        maven { url 'https://jitpack.io' }
+application {
+    mainClassName = "org.wycliffeassociates.resourcecontainer.media.MainKt"
+}
+
+shadowJar {
+    archiveFileName = 'rcmediadownloader.jar'
+    mergeServiceFiles()
+    manifest {
+        attributes(
+                'Main-Class': "org.wycliffeassociates.resourcecontainer.media.MainKt"
+        )
     }
 }
