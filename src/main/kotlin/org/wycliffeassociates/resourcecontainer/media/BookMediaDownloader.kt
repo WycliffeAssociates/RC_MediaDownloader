@@ -1,7 +1,7 @@
 package org.wycliffeassociates.resourcecontainer.media
 
 import java.io.File
-import org.wycliffeassociates.resourcecontainer.media.data.MediaContent
+import org.wycliffeassociates.resourcecontainer.media.data.MediaDivision
 import org.wycliffeassociates.resourcecontainer.media.data.MediaUrlParameter
 import org.wycliffeassociates.resourcecontainer.media.io.DownloadClient
 
@@ -43,7 +43,7 @@ class BookMediaDownloader(
 
         return templatePathInRC(
             File(url).name,
-            MediaContent.BOOK
+            MediaDivision.BOOK
         )
     }
 }

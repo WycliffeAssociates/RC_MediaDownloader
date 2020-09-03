@@ -1,6 +1,6 @@
 package org.wycliffeassociates.resourcecontainer.media.data
 
-enum class MediaContent {
+enum class MediaDivision {
     BOOK,
     CHAPTER
 }

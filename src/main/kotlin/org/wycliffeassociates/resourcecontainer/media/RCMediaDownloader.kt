@@ -2,7 +2,7 @@ package org.wycliffeassociates.resourcecontainer.media
 
 import java.io.File
 import org.wycliffeassociates.resourcecontainer.ResourceContainer
-import org.wycliffeassociates.resourcecontainer.media.data.MediaContent
+import org.wycliffeassociates.resourcecontainer.media.data.MediaDivision
 import org.wycliffeassociates.resourcecontainer.media.data.MediaUrlParameter
 
 abstract class RCMediaDownloader(
@@ -29,8 +29,8 @@ abstract class RCMediaDownloader(
             urlParams: MediaUrlParameter,
             overwrite: Boolean = false
         ): File {
-            val downloader: RCMediaDownloader = when (urlParams.mediaContent) {
-                MediaContent.CHAPTER -> ChapterMediaDownloader(rcFile, overwrite, urlParams)
+            val downloader: RCMediaDownloader = when (urlParams.mediaDivision) {
+                MediaDivision.CHAPTER -> ChapterMediaDownloader(rcFile, overwrite, urlParams)
                 else -> BookMediaDownloader(rcFile, overwrite, urlParams)
             }
 
@@ -42,9 +42,9 @@ abstract class RCMediaDownloader(
 
     abstract fun downloadMedia(url: String): String
 
-    fun templatePathInRC(fileName: String, mediaContent: MediaContent): String {
-        return when (mediaContent) {
-            MediaContent.CHAPTER -> "$MEDIA_DIR/${urlParams.projectId}/chapters/$fileName"
+    fun templatePathInRC(fileName: String, mediaDivision: MediaDivision): String {
+        return when (mediaDivision) {
+            MediaDivision.CHAPTER -> "$MEDIA_DIR/${urlParams.projectId}/chapters/$fileName"
             else -> "$MEDIA_DIR/${urlParams.projectId}/$fileName"
         }
     }
