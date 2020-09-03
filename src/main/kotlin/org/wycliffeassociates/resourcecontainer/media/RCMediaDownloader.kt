@@ -14,10 +14,12 @@ abstract class RCMediaDownloader(
         rcFile
     } else {
         // create a new copy next to the original RC file
-        rcFile.copyTo(
-            rcFile.parentFile.resolve(rcFile.nameWithoutExtension + "_updated." + rcFile.extension),
-            overwrite = true
-        )
+        val destFile = rcFile.parentFile.resolve(rcFile.nameWithoutExtension + "_updated." + rcFile.extension)
+        destFile.apply {
+            rcFile.copyRecursively(
+                destFile, overwrite = true
+            )
+        }
     }
     val rc = ResourceContainer.load(rcOutputFile)
 

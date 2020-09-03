@@ -36,7 +36,7 @@ class BookMediaDownloader(
         val downloadedFile = DownloadClient.downloadFromUrl(url, contentDir)
 
         if (downloadedFile != null) {
-            val pathInRC = "${RCMediaDownloader.MEDIA_DIR}/${urlParams.projectId}/${downloadedFile.name}"
+            val pathInRC = "$MEDIA_DIR/${urlParams.projectId}/${downloadedFile.name}"
             rc.addFileToContainer(downloadedFile, pathInRC)
         }
         contentDir.deleteRecursively() // delete temp dir after downloaded
