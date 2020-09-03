@@ -11,26 +11,6 @@ class BookMediaDownloader(
     urlParams: MediaUrlParameter
 ) : RCMediaDownloader(rcFile, overwrite, urlParams) {
 
-    override fun execute(): File {
-        val mediaProject = rc.media?.projects?.firstOrNull {
-            it.identifier == urlParams.projectId
-        } ?: return rcOutputFile
-
-        for (mediaType in urlParams.mediaTypes) {
-            // filter mediaType to download
-            val media = mediaProject.media.firstOrNull {
-                it.identifier == mediaType.name.toLowerCase()
-            }
-
-            if (media != null) {
-                media.url = downloadMedia(media.url)
-            }
-        }
-
-        rc.writeMedia()
-        return rcOutputFile
-    }
-
     override fun downloadMedia(url: String): String {
         val contentDir = createTempDir().apply { deleteOnExit() }
         val downloadedFile = DownloadClient.downloadFromUrl(url, contentDir)

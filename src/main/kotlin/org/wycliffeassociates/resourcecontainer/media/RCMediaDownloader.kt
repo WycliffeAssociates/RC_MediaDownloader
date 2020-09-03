@@ -10,10 +10,10 @@ abstract class RCMediaDownloader(
     overwrite: Boolean,
     val urlParams: MediaUrlParameter
 ) {
-    val rcOutputFile: File = if (overwrite) {
+    private val rcOutputFile: File = if (overwrite) {
         rcFile
     } else {
-        // create a new copy next to the original RC file
+        // create a new copy of the original RC file
         val destFile = rcFile.parentFile.resolve(rcFile.nameWithoutExtension + "_updated." + rcFile.extension)
         destFile.apply {
             rcFile.copyRecursively(
@@ -22,6 +22,38 @@ abstract class RCMediaDownloader(
         }
     }
     val rc = ResourceContainer.load(rcOutputFile)
+
+    private fun execute(): File {
+        val mediaProject = rc.media?.projects?.firstOrNull {
+            it.identifier == urlParams.projectId
+        } ?: return rcOutputFile
+
+        for (mediaType in urlParams.mediaTypes) {
+            // filter mediaType to download
+            val media = mediaProject.media.firstOrNull {
+                it.identifier == mediaType.name.toLowerCase()
+            }
+
+            if (media != null) {
+                when (urlParams.mediaDivision) {
+                    MediaDivision.CHAPTER -> media.chapterUrl = downloadMedia(media.chapterUrl)
+                    else -> media.url = downloadMedia(media.url)
+                }
+            }
+        }
+
+        rc.writeMedia()
+        return rcOutputFile
+    }
+
+    abstract fun downloadMedia(url: String): String
+
+    fun templatePathInRC(fileName: String, mediaDivision: MediaDivision): String {
+        return when (mediaDivision) {
+            MediaDivision.CHAPTER -> "$MEDIA_DIR/${urlParams.projectId}/chapters/$fileName"
+            else -> "$MEDIA_DIR/${urlParams.projectId}/$fileName"
+        }
+    }
 
     companion object {
         const val MEDIA_DIR = "media"
@@ -37,17 +69,6 @@ abstract class RCMediaDownloader(
             }
 
             return downloader.execute()
-        }
-    }
-
-    abstract fun execute(): File
-
-    abstract fun downloadMedia(url: String): String
-
-    fun templatePathInRC(fileName: String, mediaDivision: MediaDivision): String {
-        return when (mediaDivision) {
-            MediaDivision.CHAPTER -> "$MEDIA_DIR/${urlParams.projectId}/chapters/$fileName"
-            else -> "$MEDIA_DIR/${urlParams.projectId}/$fileName"
         }
     }
 }
