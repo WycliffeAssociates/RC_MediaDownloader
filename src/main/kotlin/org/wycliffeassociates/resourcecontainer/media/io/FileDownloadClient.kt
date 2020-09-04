@@ -15,7 +15,7 @@ interface FileDownloadClient { // implemented by retrofit service
     fun downloadFile(@Url url: String): Call<ResponseBody>
 }
 
-final class DownloadClient private constructor() {
+class DownloadClient private constructor() {
     companion object {
         fun downloadFromUrl(url: String, outputDir: File): File? {
             val urlFile = File(url)

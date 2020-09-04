@@ -32,7 +32,7 @@ class CIApplication : CliktCommand() {
 
     private val mediaTypes by option(
         "-mt", "--mediatypes",
-        help = "List of media types to download, separated by commas ','. Example: wav, png"
+        help = "List of media types to download, separated by commas ','. Example: wav,png"
     ).default("")
 
     override fun run() {
@@ -42,13 +42,13 @@ class CIApplication : CliktCommand() {
     private fun execute() {
         val rcFile = File(rcPath)
         val division = MediaDivision.get(mediaDivision)
-        val mediaTypeList = mediaTypes?.split(',').mapNotNull {
+        val mediaTypeList = mediaTypes.split(',').mapNotNull {
             MediaType.get(it)
         }
 
         return when {
             // validate args...
-            !rcFile.exists() -> System.err.println("Resource Container file not found at ${rcFile.absolutePath}")
+            !rcFile.exists() -> System.err.println("Resource Container not found at ${rcFile.absolutePath}")
             projectId.isEmpty() -> System.err.println("Invalid projectId")
             division == null -> System.err.println("Invalid media division: $mediaDivision")
             !mediaTypeList.any() -> System.err.println("Invalid media type(s)")

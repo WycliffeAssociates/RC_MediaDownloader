@@ -5,6 +5,6 @@ enum class MediaType {
     PNG;
 
     companion object {
-        inline fun get(type: String) = MediaType.values().firstOrNull { it.name == type.toUpperCase() }
+        fun get(type: String) = values().firstOrNull { it.name == type.toUpperCase() }
     }
 }

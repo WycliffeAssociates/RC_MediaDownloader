@@ -5,6 +5,6 @@ enum class MediaDivision {
     CHAPTER;
 
     companion object {
-        inline fun get(division: String) = values().firstOrNull { it.name == division.toUpperCase() }
+        fun get(division: String) = values().firstOrNull { it.name == division.toUpperCase() }
     }
 }
