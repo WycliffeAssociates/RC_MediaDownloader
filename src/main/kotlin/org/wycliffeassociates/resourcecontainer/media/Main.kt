@@ -1,23 +1,11 @@
 package org.wycliffeassociates.resourcecontainer.media
 
-import org.wycliffeassociates.resourcecontainer.ResourceContainer
 import org.wycliffeassociates.resourcecontainer.media.data.MediaDivision
 import org.wycliffeassociates.resourcecontainer.media.data.MediaType
 import org.wycliffeassociates.resourcecontainer.media.data.MediaUrlParameter
 import java.io.File
 
-fun main() {
-    val args: Array<String> = arrayOf(
-        "-rc",
-        "/path/to/rc/file",
-        "-pi",
-        "tit",
-        "-md",
-        "chapter",
-        "-mt",
-        "[wav,mp3]",
-        "-o"
-    )
+fun main(args: Array<String>) {
     val params = parseParams(args)
 
     val rcPath = params["rc"] ?: ""
@@ -27,14 +15,23 @@ fun main() {
     val overwrite = params["o"] != null
 
     val rcFile = File(rcPath)
-    val division = MediaDivision.get(mediaDivision)!!
+    val division = MediaDivision.get(mediaDivision)
     val mediaTypeList = mediaTypes.trim('[', ']').split(',').map {
-        MediaType.get(it)!!
-    }
-    // validate args...
+        MediaType.get(it)
+    }.filterNotNull()
 
-    val urlParameter = MediaUrlParameter(projectId, division, mediaTypeList)
-    RCMediaDownloader.download(rcFile, urlParameter, overwrite)
+    // validate args...
+    when {
+        !rcFile.exists() -> System.err.println("Resource Container file not found at ${rcFile.absolutePath}")
+        projectId.isEmpty() -> System.err.println("Invalid projectId")
+        division == null -> System.err.println("Invalid media division: $mediaDivision")
+        !mediaTypeList.any() -> System.err.println("Invalid media type(s)")
+        else -> {
+            val urlParameter = MediaUrlParameter(projectId, division, mediaTypeList)
+            val resultFile = RCMediaDownloader.download(rcFile, urlParameter, overwrite)
+            println("Process completed! Check your file at $resultFile.")
+        }
+    }
 }
 
 fun parseParams(args: Array<String>): Map<String, String> {
@@ -44,7 +41,7 @@ fun parseParams(args: Array<String>): Map<String, String> {
         when {
             a[0] == '-' -> {
                 if (a.length < 2) {
-                    System.err.println("Error at argument $a")
+                    System.err.println("Invalid syntax argument: $a")
                     return mapOf()
                 }
                 param = a.substring(1)
