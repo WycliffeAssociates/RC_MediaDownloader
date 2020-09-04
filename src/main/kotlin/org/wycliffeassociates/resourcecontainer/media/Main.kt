@@ -21,7 +21,7 @@ fun main(args: Array<String>) {
     }.filterNotNull()
 
     // validate args...
-    when {
+    return when {
         !rcFile.exists() -> System.err.println("Resource Container file not found at ${rcFile.absolutePath}")
         projectId.isEmpty() -> System.err.println("Invalid projectId")
         division == null -> System.err.println("Invalid media division: $mediaDivision")
