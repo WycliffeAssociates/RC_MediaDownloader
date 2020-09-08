@@ -16,7 +16,7 @@ class CIApplication : CliktCommand() {
     ).default("")
 
     private val projectId by option(
-        "-pi", "--projectid",
+        "-pid", "--projectid",
         help = "Project identifier"
     ).default("")
 
