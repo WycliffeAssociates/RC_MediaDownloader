@@ -12,7 +12,7 @@ class BookMediaDownloader(
 ) : RCMediaDownloader(rcFile, overwrite, urlParams) {
 
     override fun downloadMedia(url: String): String {
-        val contentDir = createTempDir().apply { deleteOnExit() }
+        val contentDir = createTempDir()
         val downloadedFile = DownloadClient.downloadFromUrl(url, contentDir)
 
         if (downloadedFile != null) {
