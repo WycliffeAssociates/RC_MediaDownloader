@@ -4,6 +4,9 @@ import java.io.File
 import org.wycliffeassociates.resourcecontainer.ResourceContainer
 import org.wycliffeassociates.resourcecontainer.media.data.MediaDivision
 import org.wycliffeassociates.resourcecontainer.media.data.MediaUrlParameter
+import java.net.MalformedURLException
+import java.net.URISyntaxException
+import java.net.URL
 
 abstract class RCMediaDownloader(
     rcFile: File,
@@ -36,8 +39,20 @@ abstract class RCMediaDownloader(
 
             if (media != null) {
                 when (urlParams.mediaDivision) {
-                    MediaDivision.CHAPTER -> media.chapterUrl = downloadMedia(media.chapterUrl)
-                    else -> media.url = downloadMedia(media.url)
+                    MediaDivision.CHAPTER -> {
+                        val url = media.chapterUrl
+
+                        if (validateUrl(url)) {
+                            media.chapterUrl = downloadMedia(url)
+                        }
+                    }
+                    else -> {
+                        val url = media.url
+
+                        if (validateUrl(url)) {
+                            media.url = downloadMedia(url)
+                        }
+                    }
                 }
             }
         }
@@ -52,6 +67,18 @@ abstract class RCMediaDownloader(
         return when (mediaDivision) {
             MediaDivision.CHAPTER -> "$MEDIA_DIR/${urlParams.projectId}/chapters/$fileName"
             else -> "$MEDIA_DIR/${urlParams.projectId}/$fileName"
+        }
+    }
+
+    private fun validateUrl(url: String): Boolean {
+        return try {
+            URL(url)
+            true
+        } catch (e: MalformedURLException) {
+            System.err.println(
+                "${e.message}\nThe following media url is not valid for download: $url"
+            )
+            false
         }
     }
 
