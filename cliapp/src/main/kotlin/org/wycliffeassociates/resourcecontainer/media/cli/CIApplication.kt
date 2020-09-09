@@ -56,7 +56,7 @@ class CIApplication : CliktCommand() {
             else -> {
                 val urlParameter = MediaUrlParameter(projectId, division, mediaTypeList)
                 val resultFile = RCMediaDownloader.download(rcFile, urlParameter, DownloadClient(), overwrite)
-                println("Process completed! Check your file at $resultFile.")
+                println("Process completed! Check your file at $resultFile")
             }
         }
     }

@@ -1,10 +1,14 @@
 package org.wycliffeassociates.resourcecontainer.media
 
-import java.io.File
 import org.wycliffeassociates.resourcecontainer.media.data.MediaDivision
 import org.wycliffeassociates.resourcecontainer.media.data.MediaUrlParameter
-import org.wycliffeassociates.resourcecontainer.media.io.DownloadClient
 import org.wycliffeassociates.resourcecontainer.media.io.IDownloadClient
+import java.io.File
+import java.util.function.BinaryOperator
+import java.util.function.Function
+import java.util.stream.Collectors
+import java.util.stream.Stream
+
 
 class ChapterMediaDownloader(
     rcFile: File,
@@ -15,7 +19,6 @@ class ChapterMediaDownloader(
 
     override fun downloadMedia(url: String): String {
         val contentDir = createTempDir()
-        val filesToRCMap = mutableMapOf<String, File>()
         val chapterUrlList = mutableListOf<String>()
         val possibleChapterRange = 200
 
@@ -24,15 +27,19 @@ class ChapterMediaDownloader(
             chapterUrlList.add(chapterUrl)
         }
 
-        chapterUrlList.parallelStream().forEach { downloadUrl ->
-            val downloadedFile = downloadClient.downloadFromUrl(downloadUrl, contentDir)
+        val filesToRCMap = chapterUrlList.parallelStream().collect(
+            Collectors.toConcurrentMap(
+                { downloadUrl: String ->
+                    "$MEDIA_DIR/${urlParams.projectId}/chapters/${File(downloadUrl).name}"
+                },
+                { downloadUrl: String ->
+                    downloadClient.downloadFromUrl(downloadUrl, contentDir) ?: File("")
+                },
+                { f1: File, f2: File -> if (f1.isFile) f1 else f2 }
+            )
+        )
 
-            if (downloadedFile != null) {
-                val pathInRC = "$MEDIA_DIR/${urlParams.projectId}/chapters/${downloadedFile.name}"
-                filesToRCMap[pathInRC] = downloadedFile // save File to map for later multiple addition
-            }
-        }
-        rc.addFilesToContainer(filesToRCMap)
+        rc.addFilesToContainer(filesToRCMap.filter { it.value.name.isNotEmpty() })
         contentDir.deleteRecursively() // delete temp dir after downloaded
 
         return templatePathInRC(

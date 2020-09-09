@@ -37,7 +37,6 @@ class DownloadMediaToRCTest {
 
         val file = RCMediaDownloader.download(rcFile, urlParameter, mockDownloadClient, false)
 
-        verify(mockDownloadClient, times(200)).downloadFromUrl(anyString(), this.any(File::class.java))
         val chapterUrl = getUrl(file, projectId, mediaDivision, mediaType)
         if (chapterUrl.isNullOrEmpty()) fail("Chapter url not found")
 
