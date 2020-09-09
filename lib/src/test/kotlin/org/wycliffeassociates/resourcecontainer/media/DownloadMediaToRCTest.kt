@@ -7,7 +7,6 @@ import org.wycliffeassociates.resourcecontainer.media.data.MediaDivision
 import org.wycliffeassociates.resourcecontainer.media.data.MediaType
 import org.wycliffeassociates.resourcecontainer.media.data.MediaUrlParameter
 import java.io.File
-import java.nio.file.Files
 import java.util.zip.ZipFile
 
 class DownloadMediaToRCTest {
