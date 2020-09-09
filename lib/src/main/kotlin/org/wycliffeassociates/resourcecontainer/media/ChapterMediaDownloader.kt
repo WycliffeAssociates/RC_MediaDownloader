@@ -4,12 +4,14 @@ import java.io.File
 import org.wycliffeassociates.resourcecontainer.media.data.MediaDivision
 import org.wycliffeassociates.resourcecontainer.media.data.MediaUrlParameter
 import org.wycliffeassociates.resourcecontainer.media.io.DownloadClient
+import org.wycliffeassociates.resourcecontainer.media.io.IDownloadClient
 
 class ChapterMediaDownloader(
     rcFile: File,
     overwrite: Boolean,
-    urlParams: MediaUrlParameter
-) : RCMediaDownloader(rcFile, overwrite, urlParams) {
+    urlParams: MediaUrlParameter,
+    downloadClient: IDownloadClient
+) : RCMediaDownloader(rcFile, overwrite, urlParams, downloadClient) {
 
     override fun downloadMedia(url: String): String {
         val contentDir = createTempDir()
@@ -23,7 +25,7 @@ class ChapterMediaDownloader(
         }
 
         chapterUrlList.parallelStream().forEach { downloadUrl ->
-            val downloadedFile = DownloadClient.downloadFromUrl(downloadUrl, contentDir)
+            val downloadedFile = downloadClient.downloadFromUrl(downloadUrl, contentDir)
 
             if (downloadedFile != null) {
                 val pathInRC = "$MEDIA_DIR/${urlParams.projectId}/chapters/${downloadedFile.name}"

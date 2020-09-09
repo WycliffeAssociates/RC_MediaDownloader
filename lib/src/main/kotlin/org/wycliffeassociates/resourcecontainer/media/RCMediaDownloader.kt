@@ -5,6 +5,8 @@ import java.io.File
 import org.wycliffeassociates.resourcecontainer.ResourceContainer
 import org.wycliffeassociates.resourcecontainer.media.data.MediaDivision
 import org.wycliffeassociates.resourcecontainer.media.data.MediaUrlParameter
+import org.wycliffeassociates.resourcecontainer.media.io.DownloadClient
+import org.wycliffeassociates.resourcecontainer.media.io.IDownloadClient
 import java.net.MalformedURLException
 import java.net.URISyntaxException
 import java.net.URL
@@ -12,7 +14,8 @@ import java.net.URL
 abstract class RCMediaDownloader(
     rcFile: File,
     overwrite: Boolean,
-    val urlParams: MediaUrlParameter
+    val urlParams: MediaUrlParameter,
+    val downloadClient: IDownloadClient
 ) {
     private val rcOutputFile: File = if (overwrite) {
         rcFile
@@ -88,11 +91,12 @@ abstract class RCMediaDownloader(
         fun download(
             rcFile: File,
             urlParams: MediaUrlParameter,
+            downloadClient: IDownloadClient,
             overwrite: Boolean = false
         ): File {
             val downloader: RCMediaDownloader = when (urlParams.mediaDivision) {
-                MediaDivision.CHAPTER -> ChapterMediaDownloader(rcFile, overwrite, urlParams)
-                else -> BookMediaDownloader(rcFile, overwrite, urlParams)
+                MediaDivision.CHAPTER -> ChapterMediaDownloader(rcFile, overwrite, urlParams, downloadClient)
+                else -> BookMediaDownloader(rcFile, overwrite, urlParams, downloadClient)
             }
 
             return downloader.execute()

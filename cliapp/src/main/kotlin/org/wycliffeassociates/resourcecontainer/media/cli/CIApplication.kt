@@ -7,6 +7,7 @@ import org.wycliffeassociates.resourcecontainer.media.RCMediaDownloader
 import org.wycliffeassociates.resourcecontainer.media.data.MediaDivision
 import org.wycliffeassociates.resourcecontainer.media.data.MediaType
 import org.wycliffeassociates.resourcecontainer.media.data.MediaUrlParameter
+import org.wycliffeassociates.resourcecontainer.media.io.DownloadClient
 import java.io.File
 
 class CIApplication : CliktCommand() {
@@ -54,7 +55,7 @@ class CIApplication : CliktCommand() {
             !mediaTypeList.any() -> System.err.println("Invalid media type(s)")
             else -> {
                 val urlParameter = MediaUrlParameter(projectId, division, mediaTypeList)
-                val resultFile = RCMediaDownloader.download(rcFile, urlParameter, overwrite)
+                val resultFile = RCMediaDownloader.download(rcFile, urlParameter, DownloadClient(), overwrite)
                 println("Process completed! Check your file at $resultFile.")
             }
         }
