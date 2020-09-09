@@ -26,6 +26,15 @@ abstract class RCMediaDownloader(
     }
     val rc = ResourceContainer.load(rcOutputFile)
 
+    abstract fun downloadMedia(url: String): String
+
+    fun templatePathInRC(fileName: String, mediaDivision: MediaDivision): String {
+        return when (mediaDivision) {
+            MediaDivision.CHAPTER -> "$MEDIA_DIR/${urlParams.projectId}/chapters/$fileName"
+            else -> "$MEDIA_DIR/${urlParams.projectId}/$fileName"
+        }
+    }
+
     private fun execute(): File {
         val mediaProject = rc.media?.projects?.firstOrNull {
             it.identifier == urlParams.projectId
@@ -41,14 +50,12 @@ abstract class RCMediaDownloader(
                 when (urlParams.mediaDivision) {
                     MediaDivision.CHAPTER -> {
                         val url = media.chapterUrl
-
                         if (validateUrl(url)) {
                             media.chapterUrl = downloadMedia(url)
                         }
                     }
                     else -> {
                         val url = media.url
-
                         if (validateUrl(url)) {
                             media.url = downloadMedia(url)
                         }
@@ -59,15 +66,6 @@ abstract class RCMediaDownloader(
 
         rc.writeMedia()
         return rcOutputFile
-    }
-
-    abstract fun downloadMedia(url: String): String
-
-    fun templatePathInRC(fileName: String, mediaDivision: MediaDivision): String {
-        return when (mediaDivision) {
-            MediaDivision.CHAPTER -> "$MEDIA_DIR/${urlParams.projectId}/chapters/$fileName"
-            else -> "$MEDIA_DIR/${urlParams.projectId}/$fileName"
-        }
     }
 
     private fun validateUrl(url: String): Boolean {
