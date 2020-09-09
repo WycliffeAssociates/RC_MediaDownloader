@@ -2,10 +2,17 @@ package org.wycliffeassociates.resourcecontainer.media
 
 import org.junit.Assert.*
 import org.junit.Test
+import org.mockito.ArgumentMatchers
+import org.mockito.ArgumentMatchers.any
+import org.mockito.ArgumentMatchers.anyString
+import org.mockito.Mockito
+import org.mockito.Mockito.*
 import org.wycliffeassociates.resourcecontainer.ResourceContainer
 import org.wycliffeassociates.resourcecontainer.media.data.MediaDivision
 import org.wycliffeassociates.resourcecontainer.media.data.MediaType
 import org.wycliffeassociates.resourcecontainer.media.data.MediaUrlParameter
+import org.wycliffeassociates.resourcecontainer.media.io.DownloadClient
+import org.wycliffeassociates.resourcecontainer.media.io.IDownloadClient
 import java.io.File
 import java.util.zip.ZipFile
 
@@ -17,10 +24,20 @@ class DownloadMediaToRCTest {
         val mediaDivision = MediaDivision.CHAPTER
         val rcFilePath = javaClass.classLoader.getResource("titus-test.zip").file
         val rcFile = File(rcFilePath)
-
         val urlParameter = MediaUrlParameter(projectId, mediaDivision, listOf(mediaType))
-        val file = RCMediaDownloader.download(rcFile, urlParams = urlParameter, overwrite = false)
+        val tempDir = createTempDir("testRC")
+        val mockDownloadClient = mock(IDownloadClient::class.java)
+        `when`(mockDownloadClient.downloadFromUrl(anyString(), this.any(File::class.java)))
+            .thenReturn(
+                tempDir.resolve("en_nt_ulb_tit_c01.mp3").apply { createNewFile() },
+                tempDir.resolve("en_nt_ulb_tit_c02.mp3").apply { createNewFile() },
+                tempDir.resolve("en_nt_ulb_tit_c03.mp3").apply { createNewFile() },
+                null
+            )
 
+        val file = RCMediaDownloader.download(rcFile, urlParameter, mockDownloadClient, false)
+
+        verify(mockDownloadClient, times(200)).downloadFromUrl(anyString(), this.any(File::class.java))
         val chapterUrl = getUrl(file, projectId, mediaDivision, mediaType)
         if (chapterUrl.isNullOrEmpty()) fail("Chapter url not found")
 
@@ -39,6 +56,7 @@ class DownloadMediaToRCTest {
         }
 
         rcZip.close()
+        tempDir.deleteRecursively()
         file.deleteRecursively()
 
         assertFalse(isMissingChapter)
@@ -63,4 +81,6 @@ class DownloadMediaToRCTest {
             else -> media?.url
         }
     }
+
+    private fun <T> any(type: Class<T>): T = Mockito.any<T>(type)
 }
