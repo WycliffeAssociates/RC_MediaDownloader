@@ -1,7 +1,6 @@
 package org.wycliffeassociates.resourcecontainer.media
 
-import org.junit.Assert.assertTrue
-import org.junit.Assert.fail
+import org.junit.Assert.*
 import org.junit.Test
 import org.wycliffeassociates.resourcecontainer.ResourceContainer
 import org.wycliffeassociates.resourcecontainer.media.data.MediaDivision
@@ -27,7 +26,7 @@ class DownloadMediaToRCTest {
         val mediaProject = rc.media?.projects?.firstOrNull {
             it.identifier == "tit"
         }
-        val media = mediaProject?.media?.firstOrNull() {
+        val media = mediaProject?.media?.firstOrNull {
             it.identifier == "mp3"
         }
         val chapterUrl = media?.chapterUrl
@@ -37,18 +36,20 @@ class DownloadMediaToRCTest {
         // check if entries contains the requested download files
         val rcZip = ZipFile(file)
         val listEntries = rcZip.entries().toList()
-        var flag = false
-        for (i in 1..200) {
-            flag = listEntries.any {
-                val pathInRC = chapterUrl!!.replace("{chapter}", i.toString())
+
+        var isMissingChapter = false
+        for (chapterNumber in 1..3) {
+            isMissingChapter = !listEntries.any {
+                val pathInRC = chapterUrl!!.replace("{chapter}", chapterNumber.toString())
                 it.name == "titus/$pathInRC"
             }
-            if (flag) break
+
+            if(isMissingChapter) break
         }
 
         rcZip.close()
         file.deleteRecursively()
 
-        assertTrue(flag)
+        assertFalse(isMissingChapter)
     }
 }
