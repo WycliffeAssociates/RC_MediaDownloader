@@ -1,5 +1,6 @@
 package org.wycliffeassociates.resourcecontainer.media
 
+import org.slf4j.LoggerFactory
 import java.io.File
 import org.wycliffeassociates.resourcecontainer.ResourceContainer
 import org.wycliffeassociates.resourcecontainer.media.data.MediaDivision
@@ -73,7 +74,8 @@ abstract class RCMediaDownloader(
             URL(url)
             true
         } catch (e: MalformedURLException) {
-            System.err.println(
+            val logger = LoggerFactory.getLogger(javaClass)
+            logger.error(
                 "${e.message}\nThe following media url is not valid for download: $url"
             )
             false
