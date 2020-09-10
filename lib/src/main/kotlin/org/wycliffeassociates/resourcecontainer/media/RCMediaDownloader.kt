@@ -1,15 +1,13 @@
 package org.wycliffeassociates.resourcecontainer.media
 
-import org.slf4j.LoggerFactory
 import java.io.File
+import java.net.MalformedURLException
+import java.net.URL
+import org.slf4j.LoggerFactory
 import org.wycliffeassociates.resourcecontainer.ResourceContainer
 import org.wycliffeassociates.resourcecontainer.media.data.MediaDivision
 import org.wycliffeassociates.resourcecontainer.media.data.MediaUrlParameter
-import org.wycliffeassociates.resourcecontainer.media.io.DownloadClient
 import org.wycliffeassociates.resourcecontainer.media.io.IDownloadClient
-import java.net.MalformedURLException
-import java.net.URISyntaxException
-import java.net.URL
 
 abstract class RCMediaDownloader(
     rcFile: File,

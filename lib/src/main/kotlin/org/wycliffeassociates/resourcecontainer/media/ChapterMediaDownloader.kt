@@ -1,14 +1,10 @@
 package org.wycliffeassociates.resourcecontainer.media
 
+import java.io.File
+import java.util.stream.Collectors
 import org.wycliffeassociates.resourcecontainer.media.data.MediaDivision
 import org.wycliffeassociates.resourcecontainer.media.data.MediaUrlParameter
 import org.wycliffeassociates.resourcecontainer.media.io.IDownloadClient
-import java.io.File
-import java.util.function.BinaryOperator
-import java.util.function.Function
-import java.util.stream.Collectors
-import java.util.stream.Stream
-
 
 class ChapterMediaDownloader(
     rcFile: File,

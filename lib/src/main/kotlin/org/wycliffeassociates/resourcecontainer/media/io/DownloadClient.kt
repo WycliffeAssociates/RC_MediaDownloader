@@ -10,7 +10,7 @@ import retrofit2.Retrofit
 import retrofit2.http.GET
 import retrofit2.http.Url
 
-class DownloadClient: IDownloadClient {
+class DownloadClient : IDownloadClient {
     override fun downloadFromUrl(url: String, outputDir: File): File? {
         val urlFile = File(url)
         val outputFile = outputDir.resolve(urlFile.name)
@@ -48,11 +48,9 @@ class DownloadClient: IDownloadClient {
         }
         return outputFile
     }
-
 }
 
 private interface RetrofitDownloadClient { // implemented by retrofit service
     @GET
     fun downloadFile(@Url url: String): Call<ResponseBody>
 }
-

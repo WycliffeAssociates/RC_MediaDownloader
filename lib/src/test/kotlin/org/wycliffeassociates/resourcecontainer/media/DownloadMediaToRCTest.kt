@@ -1,19 +1,21 @@
 package org.wycliffeassociates.resourcecontainer.media
 
-import org.junit.Assert.*
+import java.io.File
+import java.io.FileNotFoundException
+import java.util.zip.ZipFile
+import org.junit.Assert.assertFalse
+import org.junit.Assert.fail
 import org.junit.Test
 import org.mockito.ArgumentMatchers.anyString
 import org.mockito.Mockito
-import org.mockito.Mockito.*
+import org.mockito.Mockito.`when`
+import org.mockito.Mockito.mock
 import org.slf4j.LoggerFactory
 import org.wycliffeassociates.resourcecontainer.ResourceContainer
 import org.wycliffeassociates.resourcecontainer.media.data.MediaDivision
 import org.wycliffeassociates.resourcecontainer.media.data.MediaType
 import org.wycliffeassociates.resourcecontainer.media.data.MediaUrlParameter
 import org.wycliffeassociates.resourcecontainer.media.io.IDownloadClient
-import java.io.File
-import java.io.FileNotFoundException
-import java.util.zip.ZipFile
 
 class DownloadMediaToRCTest {
     private val logger = LoggerFactory.getLogger(javaClass)
@@ -42,7 +44,9 @@ class DownloadMediaToRCTest {
         )
 
         val chapterUrl = getMediaUrl(file, projectId, mediaDivision, mediaType)
-        if (chapterUrl.isNullOrEmpty()) fail("Chapter url not found")
+        if (chapterUrl.isNullOrEmpty()) {
+            return fail("Chapter url not found")
+        }
 
         // check if entries contain the requested download files
         val rcZip = ZipFile(file)
@@ -51,7 +55,7 @@ class DownloadMediaToRCTest {
         var isMissingChapter = false
         for (chapterNumber in 1..3) {
             isMissingChapter = !listEntries.any { entry ->
-                val pathInMediaManifest = chapterUrl!!.replace("{chapter}", chapterNumber.toString())
+                val pathInMediaManifest = chapterUrl.replace("{chapter}", chapterNumber.toString())
                 entry.name == "titus/$pathInMediaManifest"
             }
 

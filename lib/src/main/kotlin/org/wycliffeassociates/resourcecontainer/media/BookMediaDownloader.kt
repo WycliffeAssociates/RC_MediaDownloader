@@ -3,7 +3,6 @@ package org.wycliffeassociates.resourcecontainer.media
 import java.io.File
 import org.wycliffeassociates.resourcecontainer.media.data.MediaDivision
 import org.wycliffeassociates.resourcecontainer.media.data.MediaUrlParameter
-import org.wycliffeassociates.resourcecontainer.media.io.DownloadClient
 import org.wycliffeassociates.resourcecontainer.media.io.IDownloadClient
 
 class BookMediaDownloader(
