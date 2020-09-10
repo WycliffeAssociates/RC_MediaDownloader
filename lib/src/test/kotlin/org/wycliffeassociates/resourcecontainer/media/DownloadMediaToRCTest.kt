@@ -9,6 +9,7 @@ import org.mockito.Mockito
 import org.mockito.Mockito.*
 import org.mockito.invocation.InvocationOnMock
 import org.mockito.stubbing.Answer
+import org.slf4j.LoggerFactory
 import org.wycliffeassociates.resourcecontainer.ResourceContainer
 import org.wycliffeassociates.resourcecontainer.media.data.MediaDivision
 import org.wycliffeassociates.resourcecontainer.media.data.MediaType
@@ -16,16 +17,19 @@ import org.wycliffeassociates.resourcecontainer.media.data.MediaUrlParameter
 import org.wycliffeassociates.resourcecontainer.media.io.DownloadClient
 import org.wycliffeassociates.resourcecontainer.media.io.IDownloadClient
 import java.io.File
+import java.io.FileNotFoundException
 import java.util.zip.ZipFile
 
 class DownloadMediaToRCTest {
+    val logger = LoggerFactory.getLogger(javaClass)
+    val titusRCFileName = "titus-test.zip"
+
     @Test
     fun testChaptersDownload() {
         val projectId = "tit"
         val mediaType = MediaType.MP3
         val mediaDivision = MediaDivision.CHAPTER
-        val rcFilePath = javaClass.classLoader.getResource("titus-test.zip").file
-        val rcFile = File(rcFilePath)
+        val rcFile = getTestFile(titusRCFileName)
         val urlParameter = MediaUrlParameter(projectId, mediaDivision, listOf(mediaType))
         val tempDir = createTempDir("testRC")
         val mockDownloadClient = mock(IDownloadClient::class.java)
@@ -35,7 +39,7 @@ class DownloadMediaToRCTest {
                 defaultMediaFile(downloadUrl, tempDir)
             }
 
-        val file = RCMediaDownloader.download(rcFile, urlParameter, mockDownloadClient, false)
+        val file = RCMediaDownloader.download(rcFile!!, urlParameter, mockDownloadClient, false)
 
         val chapterUrl = getUrl(file, projectId, mediaDivision, mediaType)
         if (chapterUrl.isNullOrEmpty()) fail("Chapter url not found")
@@ -84,11 +88,25 @@ class DownloadMediaToRCTest {
     private fun <T> any(type: Class<T>): T = Mockito.any<T>(type)
 
     private fun defaultMediaFile(url: String, tempDir: File): File? {
-        return when (File(url).name) {
-            "en_nt_ulb_tit_c01.mp3" -> tempDir.resolve("en_nt_ulb_tit_c01.mp3").apply { createNewFile() }
-            "en_nt_ulb_tit_c02.mp3" -> tempDir.resolve("en_nt_ulb_tit_c02.mp3").apply { createNewFile() }
-            "en_nt_ulb_tit_c03.mp3" -> tempDir.resolve("en_nt_ulb_tit_c03.mp3").apply { createNewFile() }
-            else -> null
+        val defaultFileNames = arrayOf(
+            "en_nt_ulb_tit_c01.mp3",
+            "en_nt_ulb_tit_c02.mp3",
+            "en_nt_ulb_tit_c03.mp3"
+        )
+
+        return if (File(url).name in defaultFileNames) {
+            tempDir.resolve(File(url).name).apply { createNewFile() }
+        } else {
+            null
         }
+    }
+
+    @Throws(FileNotFoundException::class)
+    private fun getTestFile(name: String): File? {
+        val rcFilePath = javaClass.classLoader.getResource(name)
+        if (rcFilePath == null) {
+            throw(FileNotFoundException("Test resource not found: $name"))
+        }
+        return File(rcFilePath.file)
     }
 }
