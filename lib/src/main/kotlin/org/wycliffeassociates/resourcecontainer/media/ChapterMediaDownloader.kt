@@ -37,9 +37,9 @@ class ChapterMediaDownloader(
                 },
                 { f1: File, f2: File -> if (f1.isFile) f1 else f2 }
             )
-        )
+        ).filter { it.value.name.isNotEmpty() }
 
-        rc.addFilesToContainer(filesToRCMap.filter { it.value.name.isNotEmpty() })
+        rc.addFilesToContainer(filesToRCMap)
         contentDir.deleteRecursively() // delete temp dir after downloaded
 
         return templatePathInRC(

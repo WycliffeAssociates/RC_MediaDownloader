@@ -7,6 +7,8 @@ import org.mockito.ArgumentMatchers.any
 import org.mockito.ArgumentMatchers.anyString
 import org.mockito.Mockito
 import org.mockito.Mockito.*
+import org.mockito.invocation.InvocationOnMock
+import org.mockito.stubbing.Answer
 import org.wycliffeassociates.resourcecontainer.ResourceContainer
 import org.wycliffeassociates.resourcecontainer.media.data.MediaDivision
 import org.wycliffeassociates.resourcecontainer.media.data.MediaType
@@ -28,12 +30,10 @@ class DownloadMediaToRCTest {
         val tempDir = createTempDir("testRC")
         val mockDownloadClient = mock(IDownloadClient::class.java)
         `when`(mockDownloadClient.downloadFromUrl(anyString(), this.any(File::class.java)))
-            .thenReturn(
-                tempDir.resolve("en_nt_ulb_tit_c01.mp3").apply { createNewFile() },
-                tempDir.resolve("en_nt_ulb_tit_c02.mp3").apply { createNewFile() },
-                tempDir.resolve("en_nt_ulb_tit_c03.mp3").apply { createNewFile() },
-                null
-            )
+            .thenAnswer {
+                val downloadUrl = it.getArgument(0, String::class.java)
+                defaultMediaFile(downloadUrl, tempDir)
+            }
 
         val file = RCMediaDownloader.download(rcFile, urlParameter, mockDownloadClient, false)
 
@@ -82,4 +82,13 @@ class DownloadMediaToRCTest {
     }
 
     private fun <T> any(type: Class<T>): T = Mockito.any<T>(type)
+
+    private fun defaultMediaFile(url: String, tempDir: File): File? {
+        return when (File(url).name) {
+            "en_nt_ulb_tit_c01.mp3" -> tempDir.resolve("en_nt_ulb_tit_c01.mp3").apply { createNewFile() }
+            "en_nt_ulb_tit_c02.mp3" -> tempDir.resolve("en_nt_ulb_tit_c02.mp3").apply { createNewFile() }
+            "en_nt_ulb_tit_c03.mp3" -> tempDir.resolve("en_nt_ulb_tit_c03.mp3").apply { createNewFile() }
+            else -> null
+        }
+    }
 }
