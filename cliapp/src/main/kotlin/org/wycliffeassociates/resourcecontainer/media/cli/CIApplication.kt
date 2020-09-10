@@ -3,11 +3,12 @@ import com.github.ajalt.clikt.core.CliktCommand
 import com.github.ajalt.clikt.parameters.options.default
 import com.github.ajalt.clikt.parameters.options.flag
 import com.github.ajalt.clikt.parameters.options.option
+import java.io.File
 import org.wycliffeassociates.resourcecontainer.media.RCMediaDownloader
 import org.wycliffeassociates.resourcecontainer.media.data.MediaDivision
 import org.wycliffeassociates.resourcecontainer.media.data.MediaType
 import org.wycliffeassociates.resourcecontainer.media.data.MediaUrlParameter
-import java.io.File
+import org.wycliffeassociates.resourcecontainer.media.io.DownloadClient
 
 class CIApplication : CliktCommand() {
     private val rcPath by option(
@@ -54,8 +55,8 @@ class CIApplication : CliktCommand() {
             !mediaTypeList.any() -> System.err.println("Invalid media type(s)")
             else -> {
                 val urlParameter = MediaUrlParameter(projectId, division, mediaTypeList)
-                val resultFile = RCMediaDownloader.download(rcFile, urlParameter, overwrite)
-                println("Process completed! Check your file at $resultFile.")
+                val resultFile = RCMediaDownloader.download(rcFile, urlParameter, DownloadClient(), overwrite)
+                println("Process completed! Check your file at $resultFile")
             }
         }
     }
