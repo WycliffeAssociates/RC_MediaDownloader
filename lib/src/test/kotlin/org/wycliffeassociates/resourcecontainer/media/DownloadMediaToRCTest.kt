@@ -65,6 +65,31 @@ class DownloadMediaToRCTest {
         assertFalse(isMissingChapter)
     }
 
+    private fun <T> any(type: Class<T>): T = Mockito.any(type)
+
+    @Throws(FileNotFoundException::class)
+    private fun getTestFile(name: String): File? {
+        val rcFilePath = javaClass.classLoader.getResource(name)
+        if (rcFilePath == null) {
+            throw(FileNotFoundException("Test resource not found: $name"))
+        }
+        return File(rcFilePath.file)
+    }
+
+    private fun defaultMediaFile(url: String, tempDir: File): File? {
+        val defaultFileNames = arrayOf(
+            "en_nt_ulb_tit_c01.mp3",
+            "en_nt_ulb_tit_c02.mp3",
+            "en_nt_ulb_tit_c03.mp3"
+        )
+
+        return if (File(url).name in defaultFileNames) {
+            tempDir.resolve(File(url).name).apply { createNewFile() }
+        } else {
+            null
+        }
+    }
+
     private fun getUrl(
         rcFile: File,
         projectId: String,
@@ -83,30 +108,5 @@ class DownloadMediaToRCTest {
             MediaDivision.CHAPTER -> media?.chapterUrl
             else -> media?.url
         }
-    }
-
-    private fun <T> any(type: Class<T>): T = Mockito.any<T>(type)
-
-    private fun defaultMediaFile(url: String, tempDir: File): File? {
-        val defaultFileNames = arrayOf(
-            "en_nt_ulb_tit_c01.mp3",
-            "en_nt_ulb_tit_c02.mp3",
-            "en_nt_ulb_tit_c03.mp3"
-        )
-
-        return if (File(url).name in defaultFileNames) {
-            tempDir.resolve(File(url).name).apply { createNewFile() }
-        } else {
-            null
-        }
-    }
-
-    @Throws(FileNotFoundException::class)
-    private fun getTestFile(name: String): File? {
-        val rcFilePath = javaClass.classLoader.getResource(name)
-        if (rcFilePath == null) {
-            throw(FileNotFoundException("Test resource not found: $name"))
-        }
-        return File(rcFilePath.file)
     }
 }
