@@ -17,46 +17,31 @@ import java.util.zip.ZipFile
 
 class DownloadMediaToRCTest {
     private val logger = LoggerFactory.getLogger(javaClass)
-    private val titusRCFileName = "titus-test.zip"
-
-    private data class DownloaderParams(
-        val rcFile: File,
-        val urlParams: MediaUrlParameter,
-        val downloadClient: IDownloadClient,
-        val overwrite: Boolean = false
-    )
 
     @Test
     fun testChaptersDownload() {
+        val rcFileName = "titus-test.zip"
+        val projectId = "tit"
         val mediaType = MediaType.MP3
+        val mediaDivision = MediaDivision.CHAPTER
+
         val tempDir = createTempDir("testRC")
         val mockDownloadClient = mock(IDownloadClient::class.java)
+
         `when`(mockDownloadClient.downloadFromUrl(anyString(), this.any(File::class.java)))
             .thenAnswer {
                 val downloadUrl = it.getArgument(0, String::class.java)
                 defaultMediaFile(downloadUrl, tempDir)
             }
 
-        val downloaderParams = DownloaderParams(
-            getTestFile(titusRCFileName),
-            MediaUrlParameter("tit", MediaDivision.CHAPTER, listOf(mediaType)),
-            mockDownloadClient
-        )
-
         val file = RCMediaDownloader.download(
-            downloaderParams.rcFile,
-            downloaderParams.urlParams,
-            downloaderParams.downloadClient,
-            downloaderParams.overwrite
+            getTestFile(rcFileName),
+            MediaUrlParameter(projectId, mediaDivision, listOf(mediaType)),
+            mockDownloadClient,
+            overwrite = false
         )
 
-        val chapterUrl = getUrl(
-            file,
-            downloaderParams.urlParams.projectId,
-            downloaderParams.urlParams.mediaDivision,
-            mediaType
-        )
-
+        val chapterUrl = getMediaUrl(file, projectId, mediaDivision, mediaType)
         if (chapterUrl.isNullOrEmpty()) fail("Chapter url not found")
 
         // check if entries contain the requested download files
@@ -105,7 +90,7 @@ class DownloadMediaToRCTest {
         }
     }
 
-    private fun getUrl(
+    private fun getMediaUrl(
         rcFile: File,
         projectId: String,
         mediaDivision: MediaDivision,
