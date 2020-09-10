@@ -2,35 +2,33 @@ package org.wycliffeassociates.resourcecontainer.media
 
 import org.junit.Assert.*
 import org.junit.Test
-import org.mockito.ArgumentMatchers
-import org.mockito.ArgumentMatchers.any
 import org.mockito.ArgumentMatchers.anyString
 import org.mockito.Mockito
 import org.mockito.Mockito.*
-import org.mockito.invocation.InvocationOnMock
-import org.mockito.stubbing.Answer
 import org.slf4j.LoggerFactory
 import org.wycliffeassociates.resourcecontainer.ResourceContainer
 import org.wycliffeassociates.resourcecontainer.media.data.MediaDivision
 import org.wycliffeassociates.resourcecontainer.media.data.MediaType
 import org.wycliffeassociates.resourcecontainer.media.data.MediaUrlParameter
-import org.wycliffeassociates.resourcecontainer.media.io.DownloadClient
 import org.wycliffeassociates.resourcecontainer.media.io.IDownloadClient
 import java.io.File
 import java.io.FileNotFoundException
 import java.util.zip.ZipFile
 
 class DownloadMediaToRCTest {
-    val logger = LoggerFactory.getLogger(javaClass)
-    val titusRCFileName = "titus-test.zip"
+    private val logger = LoggerFactory.getLogger(javaClass)
+    private val titusRCFileName = "titus-test.zip"
+
+    private data class DownloaderParams(
+        val rcFile: File,
+        val urlParams: MediaUrlParameter,
+        val downloadClient: IDownloadClient,
+        val overwrite: Boolean = false
+    )
 
     @Test
     fun testChaptersDownload() {
-        val projectId = "tit"
         val mediaType = MediaType.MP3
-        val mediaDivision = MediaDivision.CHAPTER
-        val rcFile = getTestFile(titusRCFileName)
-        val urlParameter = MediaUrlParameter(projectId, mediaDivision, listOf(mediaType))
         val tempDir = createTempDir("testRC")
         val mockDownloadClient = mock(IDownloadClient::class.java)
         `when`(mockDownloadClient.downloadFromUrl(anyString(), this.any(File::class.java)))
@@ -39,9 +37,26 @@ class DownloadMediaToRCTest {
                 defaultMediaFile(downloadUrl, tempDir)
             }
 
-        val file = RCMediaDownloader.download(rcFile!!, urlParameter, mockDownloadClient, false)
+        val downloaderParams = DownloaderParams(
+            getTestFile(titusRCFileName),
+            MediaUrlParameter("tit", MediaDivision.CHAPTER, listOf(mediaType)),
+            mockDownloadClient
+        )
 
-        val chapterUrl = getUrl(file, projectId, mediaDivision, mediaType)
+        val file = RCMediaDownloader.download(
+            downloaderParams.rcFile,
+            downloaderParams.urlParams,
+            downloaderParams.downloadClient,
+            downloaderParams.overwrite
+        )
+
+        val chapterUrl = getUrl(
+            file,
+            downloaderParams.urlParams.projectId,
+            downloaderParams.urlParams.mediaDivision,
+            mediaType
+        )
+
         if (chapterUrl.isNullOrEmpty()) fail("Chapter url not found")
 
         // check if entries contain the requested download files
@@ -68,7 +83,7 @@ class DownloadMediaToRCTest {
     private fun <T> any(type: Class<T>): T = Mockito.any(type)
 
     @Throws(FileNotFoundException::class)
-    private fun getTestFile(name: String): File? {
+    private fun getTestFile(name: String): File {
         val rcFilePath = javaClass.classLoader.getResource(name)
         if (rcFilePath == null) {
             throw(FileNotFoundException("Test resource not found: $name"))
