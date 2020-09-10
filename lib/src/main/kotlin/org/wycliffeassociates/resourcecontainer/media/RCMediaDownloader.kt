@@ -10,12 +10,27 @@ import org.wycliffeassociates.resourcecontainer.media.data.MediaUrlParameter
 import org.wycliffeassociates.resourcecontainer.media.io.IDownloadClient
 
 abstract class RCMediaDownloader(
+    rcFile: File,
+    overwrite: Boolean,
     val urlParams: MediaUrlParameter,
     val downloadClient: IDownloadClient
 ) {
+    private val rcOutputFile: File = if (overwrite) {
+        rcFile
+    } else {
+        // create a new copy of the original RC file
+        val newRCFile = rcFile.parentFile.resolve(rcFile.nameWithoutExtension + "_updated." + rcFile.extension)
+        if (newRCFile.exists()) newRCFile.deleteRecursively()
+        newRCFile.apply {
+            rcFile.copyRecursively(
+                newRCFile, overwrite = true
+            )
+        }
+    }
+    val rc = ResourceContainer.load(rcOutputFile)
     val logger = LoggerFactory.getLogger(javaClass)
 
-    abstract fun downloadMedia(url: String, rc: ResourceContainer): String
+    abstract fun downloadMedia(url: String): String
 
     fun templatePathInRC(fileName: String, mediaDivision: MediaDivision): String {
         return when (mediaDivision) {
@@ -24,10 +39,10 @@ abstract class RCMediaDownloader(
         }
     }
 
-    private fun execute(rc: ResourceContainer, rcFile: File): File {
+    private fun execute(): File {
         val mediaProject = rc.media?.projects?.firstOrNull {
             it.identifier == urlParams.projectId
-        } ?: return rcFile
+        } ?: return rcOutputFile
 
         for (mediaType in urlParams.mediaTypes) {
             // filter mediaType to download
@@ -40,13 +55,13 @@ abstract class RCMediaDownloader(
                     MediaDivision.CHAPTER -> {
                         val url = media.chapterUrl
                         if (validateUrl(url)) {
-                            media.chapterUrl = downloadMedia(url, rc)
+                            media.chapterUrl = downloadMedia(url)
                         }
                     }
                     else -> {
                         val url = media.url
                         if (validateUrl(url)) {
-                            media.url = downloadMedia(url, rc)
+                            media.url = downloadMedia(url)
                         }
                     }
                 }
@@ -54,7 +69,7 @@ abstract class RCMediaDownloader(
         }
 
         rc.writeMedia()
-        return rcFile
+        return rcOutputFile
     }
 
     private fun validateUrl(url: String): Boolean {
@@ -79,26 +94,11 @@ abstract class RCMediaDownloader(
             overwrite: Boolean = false
         ): File {
             val downloader: RCMediaDownloader = when (urlParams.mediaDivision) {
-                MediaDivision.CHAPTER -> ChapterMediaDownloader(urlParams, downloadClient)
-                else -> BookMediaDownloader(urlParams, downloadClient)
+                MediaDivision.CHAPTER -> ChapterMediaDownloader(rcFile, overwrite, urlParams, downloadClient)
+                else -> BookMediaDownloader(rcFile, overwrite, urlParams, downloadClient)
             }
 
-            val rcOutputFile: File = if (overwrite) {
-                rcFile
-            } else {
-                // create a new copy of the original RC file
-                val newRCFile = rcFile.parentFile.resolve(rcFile.nameWithoutExtension + "_updated." + rcFile.extension)
-                if (newRCFile.exists()) newRCFile.deleteRecursively()
-                newRCFile.apply {
-                    rcFile.copyRecursively(
-                        newRCFile, overwrite = true
-                    )
-                }
-            }
-
-            ResourceContainer.load(rcOutputFile).use { rc ->
-                return downloader.execute(rc, rcOutputFile)
-            }
+            return downloader.execute()
         }
     }
 }

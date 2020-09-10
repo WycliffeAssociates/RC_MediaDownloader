@@ -1,17 +1,18 @@
 package org.wycliffeassociates.resourcecontainer.media
 
-import org.wycliffeassociates.resourcecontainer.ResourceContainer
 import java.io.File
 import org.wycliffeassociates.resourcecontainer.media.data.MediaDivision
 import org.wycliffeassociates.resourcecontainer.media.data.MediaUrlParameter
 import org.wycliffeassociates.resourcecontainer.media.io.IDownloadClient
 
 class BookMediaDownloader(
+    rcFile: File,
+    overwrite: Boolean,
     urlParams: MediaUrlParameter,
     downloadClient: IDownloadClient
-) : RCMediaDownloader(urlParams, downloadClient) {
+) : RCMediaDownloader(rcFile, overwrite, urlParams, downloadClient) {
 
-    override fun downloadMedia(url: String, rc: ResourceContainer): String {
+    override fun downloadMedia(url: String): String {
         val contentDir = createTempDir()
         val downloadedFile = downloadClient.downloadFromUrl(url, contentDir)
 
