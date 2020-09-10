@@ -27,6 +27,7 @@ abstract class RCMediaDownloader(
         }
     }
     val rc = ResourceContainer.load(rcOutputFile)
+    val logger = LoggerFactory.getLogger(javaClass)
 
     abstract fun downloadMedia(url: String): String
 
@@ -75,7 +76,6 @@ abstract class RCMediaDownloader(
             URL(url)
             true
         } catch (e: MalformedURLException) {
-            val logger = LoggerFactory.getLogger(javaClass)
             logger.error(
                 "${e.message}\nThe following media url is not valid for download: $url"
             )

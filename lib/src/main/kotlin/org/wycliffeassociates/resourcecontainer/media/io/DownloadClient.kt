@@ -11,6 +11,8 @@ import retrofit2.http.GET
 import retrofit2.http.Url
 
 class DownloadClient : IDownloadClient {
+    private val logger = LoggerFactory.getLogger(javaClass)
+
     override fun downloadFromUrl(url: String, outputDir: File): File? {
         val urlFile = File(url)
         val outputFile = outputDir.resolve(urlFile.name)
@@ -28,7 +30,6 @@ class DownloadClient : IDownloadClient {
         if (response.isSuccessful) {
             val body = response.body()
             if (body == null) {
-                val logger = LoggerFactory.getLogger(javaClass)
                 logger.error("No response body found. ${response.message()}")
             } else {
                 writeTempDownload(body, outputFile)
