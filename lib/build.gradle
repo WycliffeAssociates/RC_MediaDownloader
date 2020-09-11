@@ -49,6 +49,7 @@ uploadArchives {
                         password: System.getenv("NEXUS_PASSWORD")
                 )
             }
+            pom.artifactId = 'rcmediadownloader'
             pom.project {
                 licenses {
                     license {
