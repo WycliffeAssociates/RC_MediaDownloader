@@ -1,4 +1,4 @@
-package org.wycliffeassociates.resourcecontainer.media.io
+package org.wycliffeassociates.rcmediadownloader.io
 
 import java.io.BufferedInputStream
 import java.io.File
