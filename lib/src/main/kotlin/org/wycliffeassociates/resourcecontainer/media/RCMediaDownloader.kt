@@ -24,10 +24,10 @@ abstract class RCMediaDownloader(
         }
     }
 
-    private fun execute(rc: ResourceContainer, rcFile: File): File {
+    private fun execute(rc: ResourceContainer): File {
         val mediaProject = rc.media?.projects?.firstOrNull {
             it.identifier == urlParams.projectId
-        } ?: return rcFile
+        } ?: return rc.file
 
         for (mediaType in urlParams.mediaTypes) {
             // filter mediaType to download
@@ -54,7 +54,7 @@ abstract class RCMediaDownloader(
         }
 
         rc.writeMedia()
-        return rcFile
+        return rc.file
     }
 
     private fun validateUrl(url: String): Boolean {
@@ -97,7 +97,7 @@ abstract class RCMediaDownloader(
             }
 
             ResourceContainer.load(rcOutputFile).use { rc ->
-                return downloader.execute(rc, rcOutputFile)
+                return downloader.execute(rc)
             }
         }
     }
