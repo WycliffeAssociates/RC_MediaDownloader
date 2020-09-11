@@ -2,6 +2,19 @@
 
 This tool supports downloading media content to the given resource container and update the urls with respect to the resource container itself.
 
+# Installation
+Add the custom maven repository
+```
+repositories {
+    ...
+    maven { url "https://nexus-registry.walink.org/repository/maven-public/" }
+}
+```
+Add this to your dependencies (Gradle):
+```
+implementation 'org.wycliffeassociates:rcmediadownloader:1.0.0'
+```
+
 # Usage
 
 Run the .jar executable file with the following arguments:
