@@ -1,11 +1,11 @@
-package org.wycliffeassociates.resourcecontainer.media
+package org.wycliffeassociates.rcmediadownloader
 
 import java.io.File
 import java.util.stream.Collectors
+import org.wycliffeassociates.rcmediadownloader.data.MediaDivision
+import org.wycliffeassociates.rcmediadownloader.data.MediaUrlParameter
+import org.wycliffeassociates.rcmediadownloader.io.IDownloadClient
 import org.wycliffeassociates.resourcecontainer.ResourceContainer
-import org.wycliffeassociates.resourcecontainer.media.data.MediaDivision
-import org.wycliffeassociates.resourcecontainer.media.data.MediaUrlParameter
-import org.wycliffeassociates.resourcecontainer.media.io.IDownloadClient
 
 class ChapterMediaDownloader(
     urlParams: MediaUrlParameter,

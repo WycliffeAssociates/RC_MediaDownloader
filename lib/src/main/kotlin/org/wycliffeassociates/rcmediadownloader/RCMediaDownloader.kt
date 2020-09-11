@@ -1,13 +1,13 @@
-package org.wycliffeassociates.resourcecontainer.media
+package org.wycliffeassociates.rcmediadownloader
 
 import java.io.File
 import java.net.MalformedURLException
 import java.net.URL
 import org.slf4j.LoggerFactory
+import org.wycliffeassociates.rcmediadownloader.data.MediaDivision
+import org.wycliffeassociates.rcmediadownloader.data.MediaUrlParameter
+import org.wycliffeassociates.rcmediadownloader.io.IDownloadClient
 import org.wycliffeassociates.resourcecontainer.ResourceContainer
-import org.wycliffeassociates.resourcecontainer.media.data.MediaDivision
-import org.wycliffeassociates.resourcecontainer.media.data.MediaUrlParameter
-import org.wycliffeassociates.resourcecontainer.media.io.IDownloadClient
 
 abstract class RCMediaDownloader(
     val urlParams: MediaUrlParameter,

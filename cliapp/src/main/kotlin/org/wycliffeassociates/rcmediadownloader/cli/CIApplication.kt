@@ -1,14 +1,14 @@
-package org.wycliffeassociates.resourcecontainer.media.cli
+package org.wycliffeassociates.rcmediadownloader.cli
 import com.github.ajalt.clikt.core.CliktCommand
 import com.github.ajalt.clikt.parameters.options.default
 import com.github.ajalt.clikt.parameters.options.flag
 import com.github.ajalt.clikt.parameters.options.option
 import java.io.File
-import org.wycliffeassociates.resourcecontainer.media.RCMediaDownloader
-import org.wycliffeassociates.resourcecontainer.media.data.MediaDivision
-import org.wycliffeassociates.resourcecontainer.media.data.MediaType
-import org.wycliffeassociates.resourcecontainer.media.data.MediaUrlParameter
-import org.wycliffeassociates.resourcecontainer.media.io.DownloadClient
+import org.wycliffeassociates.rcmediadownloader.RCMediaDownloader
+import org.wycliffeassociates.rcmediadownloader.data.MediaDivision
+import org.wycliffeassociates.rcmediadownloader.data.MediaType
+import org.wycliffeassociates.rcmediadownloader.data.MediaUrlParameter
+import org.wycliffeassociates.rcmediadownloader.io.DownloadClient
 
 class CIApplication : CliktCommand() {
     private val rcPath by option(

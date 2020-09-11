@@ -1,4 +1,4 @@
-package org.wycliffeassociates.resourcecontainer.media.data
+package org.wycliffeassociates.rcmediadownloader.data
 
 enum class MediaType {
     WAV,

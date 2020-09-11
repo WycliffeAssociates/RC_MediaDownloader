@@ -1,4 +1,4 @@
-package org.wycliffeassociates.resourcecontainer.media
+package org.wycliffeassociates.rcmediadownloader
 
 import java.io.File
 import java.io.FileNotFoundException
@@ -11,11 +11,11 @@ import org.mockito.Mockito
 import org.mockito.Mockito.`when`
 import org.mockito.Mockito.mock
 import org.slf4j.LoggerFactory
+import org.wycliffeassociates.rcmediadownloader.data.MediaDivision
+import org.wycliffeassociates.rcmediadownloader.data.MediaType
+import org.wycliffeassociates.rcmediadownloader.data.MediaUrlParameter
+import org.wycliffeassociates.rcmediadownloader.io.IDownloadClient
 import org.wycliffeassociates.resourcecontainer.ResourceContainer
-import org.wycliffeassociates.resourcecontainer.media.data.MediaDivision
-import org.wycliffeassociates.resourcecontainer.media.data.MediaType
-import org.wycliffeassociates.resourcecontainer.media.data.MediaUrlParameter
-import org.wycliffeassociates.resourcecontainer.media.io.IDownloadClient
 
 class DownloadMediaToRCTest {
     private val logger = LoggerFactory.getLogger(javaClass)

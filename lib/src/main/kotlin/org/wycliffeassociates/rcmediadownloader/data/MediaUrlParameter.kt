@@ -1,4 +1,4 @@
-package org.wycliffeassociates.resourcecontainer.media.data
+package org.wycliffeassociates.rcmediadownloader.data
 
 data class MediaUrlParameter(
     val projectId: String,
