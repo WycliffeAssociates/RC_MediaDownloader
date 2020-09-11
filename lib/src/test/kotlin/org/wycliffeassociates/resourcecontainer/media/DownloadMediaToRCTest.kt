@@ -48,21 +48,21 @@ class DownloadMediaToRCTest {
             return fail("Chapter url not found")
         }
 
-        // check if entries contain the requested download files
-        val rcZip = ZipFile(file)
-        val listEntries = rcZip.entries().toList()
-
+//         check if entries contain the requested download files
         var isMissingChapter = false
-        for (chapterNumber in 1..3) {
-            isMissingChapter = !listEntries.any { entry ->
-                val pathInMediaManifest = chapterUrl.replace("{chapter}", chapterNumber.toString())
-                entry.name == "titus/$pathInMediaManifest"
-            }
+        ZipFile(file).use { rcZip ->
+            val listEntries = rcZip.entries().toList()
 
-            if (isMissingChapter) break
+            for (chapterNumber in 1..3) {
+                isMissingChapter = !listEntries.any { entry ->
+                    val pathInMediaManifest = chapterUrl.replace("{chapter}", chapterNumber.toString())
+                    entry.name == "titus/$pathInMediaManifest"
+                }
+
+                if (isMissingChapter) break
+            }
         }
 
-        rcZip.close()
         tempDir.deleteRecursively()
         file.deleteRecursively()
 
@@ -100,17 +100,18 @@ class DownloadMediaToRCTest {
         mediaDivision: MediaDivision,
         mediaType: MediaType
     ): String? {
-        val rc = ResourceContainer.load(rcFile)
-        val mediaProject = rc.media?.projects?.firstOrNull {
-            it.identifier == projectId
-        }
-        val media = mediaProject?.media?.firstOrNull {
-            it.identifier == mediaType.name.toLowerCase()
-        }
+        ResourceContainer.load(rcFile).use { rc ->
+            val mediaProject = rc.media?.projects?.firstOrNull {
+                it.identifier == projectId
+            }
+            val media = mediaProject?.media?.firstOrNull {
+                it.identifier == mediaType.name.toLowerCase()
+            }
 
-        return when (mediaDivision) {
-            MediaDivision.CHAPTER -> media?.chapterUrl
-            else -> media?.url
+            return when (mediaDivision) {
+                MediaDivision.CHAPTER -> media?.chapterUrl
+                else -> media?.url
+            }
         }
     }
 }
