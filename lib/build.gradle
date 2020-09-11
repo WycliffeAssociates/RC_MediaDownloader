@@ -12,7 +12,11 @@ plugins {
     id 'kotlin'
     id 'org.jlleitschuh.gradle.ktlint'
     id 'io.gitlab.arturbosch.detekt'
+    id 'maven'
 }
+
+group = 'org.wycliffeassociates'
+version = '1.0.0'
 
 repositories {
     jcenter()
@@ -28,4 +32,32 @@ dependencies {
 
     testImplementation group: 'org.mockito', name: 'mockito-core', version: '3.3.3'
     testImplementation group: 'junit', name: 'junit', version: '4.12'
+}
+
+uploadArchives {
+    repositories {
+        mavenDeployer {
+            repository(url: "${System.getenv("NEXUS_URL")}/repository/maven-releases") {
+                authentication(
+                        userName: System.getenv("NEXUS_USER"),
+                        password: System.getenv("NEXUS_PASSWORD")
+                )
+            }
+            snapshotRepository(url: "${System.getenv("NEXUS_URL")}/repository/maven-snapshots") {
+                authentication(
+                        userName: System.getenv("NEXUS_USER"),
+                        password: System.getenv("NEXUS_PASSWORD")
+                )
+            }
+            pom.project {
+                licenses {
+                    license {
+                        name 'MIT License'
+                        url 'https://raw.githubusercontent.com/WycliffeAssociates/RC_MediaDownloader/master/LICENSE'
+                        distribution 'repo'
+                    }
+                }
+            }
+        }
+    }
 }
