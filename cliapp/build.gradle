@@ -1,0 +1,47 @@
+buildscript {
+    repositories {
+        mavenCentral()
+    }
+    dependencies {
+        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_ver"
+    }
+}
+
+plugins {
+    id 'com.github.johnrengelman.shadow' version "5.2.0"
+    id 'kotlin'
+    id 'org.jlleitschuh.gradle.ktlint'
+    id 'io.gitlab.arturbosch.detekt'
+}
+
+apply plugin: 'application'
+apply plugin: 'idea'
+
+group 'org.wycliffeassociates'
+version '1.0-SNAPSHOT'
+
+repositories {
+    jcenter()
+}
+
+dependencies {
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8"
+    implementation "com.github.ajalt.clikt:clikt:3.0.0"
+    implementation project(':lib')
+
+    testCompile group: 'junit', name: 'junit', version: '4.12'
+}
+
+application {
+    mainClassName = "org.wycliffeassociates.resourcecontainer.media.cli.MainKt"
+}
+
+shadowJar {
+    archiveFileName = 'rcmediadownloader.jar'
+    mergeServiceFiles()
+    manifest {
+        attributes(
+                'Main-Class': "org.wycliffeassociates.resourcecontainer.media.cli.MainKt"
+        )
+    }
+}
