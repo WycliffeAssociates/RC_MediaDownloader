@@ -15,7 +15,7 @@ plugins {
     id 'maven'
 }
 
-group = 'org.wycliffeassociates.resourcecontainer.lib'
+group = 'org.wycliffeassociates'
 version = '1.0.0'
 
 repositories {
