@@ -1,17 +1,13 @@
 package org.wycliffeassociates.rcmediadownloader
 
-import kotlinx.coroutines.GlobalScope
+import java.io.File
+import java.util.concurrent.ConcurrentHashMap
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
-import java.io.File
-import java.util.stream.Collectors
 import org.wycliffeassociates.rcmediadownloader.data.MediaDivision
 import org.wycliffeassociates.rcmediadownloader.data.MediaUrlParameter
 import org.wycliffeassociates.rcmediadownloader.io.IDownloadClient
 import org.wycliffeassociates.resourcecontainer.ResourceContainer
-import java.util.concurrent.ConcurrentHashMap
-import kotlin.coroutines.CoroutineContext
-import kotlin.coroutines.coroutineContext
 
 class ChapterMediaDownloader(
     urlParams: MediaUrlParameter,
