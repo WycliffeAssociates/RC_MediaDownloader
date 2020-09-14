@@ -33,7 +33,7 @@ dependencies {
 }
 
 application {
-    mainClassName = "org.wycliffeassociates.resourcecontainer.media.cli.MainKt"
+    mainClassName = "org.wycliffeassociates.rcmediadownloader.cli.MainKt"
 }
 
 shadowJar {
@@ -41,7 +41,7 @@ shadowJar {
     mergeServiceFiles()
     manifest {
         attributes(
-                'Main-Class': "org.wycliffeassociates.resourcecontainer.media.cli.MainKt"
+                'Main-Class': "org.wycliffeassociates.rcmediadownloader.cli.MainKt"
         )
     }
 }
