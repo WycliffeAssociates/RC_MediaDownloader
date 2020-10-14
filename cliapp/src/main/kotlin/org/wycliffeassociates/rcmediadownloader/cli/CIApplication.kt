@@ -3,6 +3,7 @@ import com.github.ajalt.clikt.core.CliktCommand
 import com.github.ajalt.clikt.parameters.options.default
 import com.github.ajalt.clikt.parameters.options.flag
 import com.github.ajalt.clikt.parameters.options.option
+import com.github.ajalt.clikt.parameters.types.int
 import java.io.File
 import org.wycliffeassociates.rcmediadownloader.RCMediaDownloader
 import org.wycliffeassociates.rcmediadownloader.data.MediaDivision
@@ -25,6 +26,11 @@ class CIApplication : CliktCommand() {
         "-md", "--mediadivision",
         help = "Media division. Example: book"
     ).default("")
+
+    private val chapter: Int? by option(
+        "-ch", "--chapternumber",
+        help = "Chapter number to download. Omit this will download all available chapters."
+    ).int()
 
     private val overwrite: Boolean by option(
         "-o", "--overwrite",
@@ -54,7 +60,7 @@ class CIApplication : CliktCommand() {
             division == null -> System.err.println("Invalid media division: $mediaDivision")
             !mediaTypeList.any() -> System.err.println("Invalid media type(s)")
             else -> {
-                val urlParameter = MediaUrlParameter(projectId, division, mediaTypeList)
+                val urlParameter = MediaUrlParameter(projectId, division, mediaTypeList, chapter)
                 val resultFile = RCMediaDownloader.download(rcFile, urlParameter, DownloadClient(), overwrite)
                 println("Process completed! Check your file at $resultFile")
             }
