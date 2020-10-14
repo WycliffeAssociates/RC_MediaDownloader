@@ -1,9 +1,11 @@
 package org.wycliffeassociates.rcmediadownloader
 
-import org.junit.Assert.*
 import java.io.File
 import java.io.FileNotFoundException
 import java.util.zip.ZipFile
+import org.junit.Assert.assertFalse
+import org.junit.Assert.assertTrue
+import org.junit.Assert.fail
 import org.junit.Test
 import org.mockito.ArgumentMatchers.anyString
 import org.mockito.Mockito
