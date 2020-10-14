@@ -87,6 +87,7 @@ class DownloadMediaToRCTest {
         )
 
         verify(mockDownloadClient, times(200))
+            .downloadFromUrl(anyString(), this.any(File::class.java))
 
         val chapterUrl = getMediaUrl(file, projectId, mediaDivision, mediaType)
         if (chapterUrl.isNullOrEmpty()) {
