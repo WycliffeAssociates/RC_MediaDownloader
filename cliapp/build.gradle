@@ -25,7 +25,7 @@ repositories {
 }
 
 dependencies {
-    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8"
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_ver"
     implementation "com.github.ajalt.clikt:clikt:3.0.0"
     implementation project(':lib')
 
