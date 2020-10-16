@@ -23,7 +23,7 @@ repositories {
 }
 
 dependencies {
-    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8"
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_ver"
     implementation "org.wycliffeassociates:kotlin-resource-container:0.6.0"
     implementation "com.squareup.retrofit2:retrofit:$retrofit_ver"
     implementation "org.slf4j:slf4j-api:$slf4j_api_ver"
