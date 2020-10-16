@@ -2,8 +2,8 @@
 
 This tool supports downloading media content to the given resource container and update the urls with respect to the resource container itself.
 
-# Installation
-Add the custom maven repository
+# Library Module Usage
+Add this custom maven repository
 ```
 repositories {
     ...
@@ -15,7 +15,16 @@ Add this to your dependencies (Gradle):
 implementation 'org.wycliffeassociates:rcmediadownloader:1.0.0'
 ```
 
-# Usage
+Finally, in your code:
+```
+val urlParameter = MediaUrlParameter(projectId, mediaDivision, mediaTypes)
+// this will return a new RC file
+val file = RCMediaDownloader.download(rcFile, urlParameter, DownloadClient()) 
+
+// or you want to overwrite the original RC file
+val file = RCMediaDownloader.download(rcFile, urlParameter, DownloadClient(), overwrite = true)
+```
+# CLI/Terminal Usage (Java 11+ required)
 
 Run the .jar executable file with the following arguments:
 
@@ -32,4 +41,3 @@ Run the .jar executable file with the following arguments:
 ```
   java -jar rcmediadownloader.jar -rc <PathToRC> -pid <ProjectId> -md <MediaDivision> -mt <MediaTypes>
 ```
-
