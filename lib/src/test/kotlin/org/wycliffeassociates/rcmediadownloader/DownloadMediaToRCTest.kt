@@ -9,10 +9,7 @@ import org.junit.Assert.fail
 import org.junit.Test
 import org.mockito.ArgumentMatchers.anyString
 import org.mockito.Mockito
-import org.mockito.Mockito.`when`
-import org.mockito.Mockito.mock
-import org.mockito.Mockito.times
-import org.mockito.Mockito.verify
+import org.mockito.Mockito.*
 import org.slf4j.LoggerFactory
 import org.wycliffeassociates.rcmediadownloader.data.MediaDivision
 import org.wycliffeassociates.rcmediadownloader.data.MediaType
@@ -72,12 +69,10 @@ class DownloadMediaToRCTest {
         val mockDownloadClient = mock(IDownloadClient::class.java)
 
         `when`(mockDownloadClient.downloadFromUrl(anyString(), this.any(File::class.java)))
-            .thenReturn(
-                tempDir.resolve("en_nt_ulb_tit_c01.mp3").apply { createNewFile() },
-                tempDir.resolve("en_nt_ulb_tit_c02.mp3").apply { createNewFile() },
-                tempDir.resolve("en_nt_ulb_tit_c03.mp3").apply { createNewFile() },
-                null
-            )
+            .thenAnswer {
+                val downloadUrl = it.getArgument(0, String::class.java)
+                defaultMediaFile(downloadUrl, tempDir)
+            }
 
         val file = RCMediaDownloader.download(
             getTestFile(rcFileName),
@@ -124,6 +119,20 @@ class DownloadMediaToRCTest {
             throw(FileNotFoundException("Test resource not found: $name"))
         }
         return File(rcFilePath.file)
+    }
+
+    private fun defaultMediaFile(url: String, tempDir: File): File? {
+        val defaultFileNames = arrayOf(
+            "en_nt_ulb_tit_c01.mp3",
+            "en_nt_ulb_tit_c02.mp3",
+            "en_nt_ulb_tit_c03.mp3"
+        )
+
+        return if (File(url).name in defaultFileNames) {
+            tempDir.resolve(File(url).name).apply { createNewFile() }
+        } else {
+            null
+        }
     }
 
     private fun getMediaUrl(
