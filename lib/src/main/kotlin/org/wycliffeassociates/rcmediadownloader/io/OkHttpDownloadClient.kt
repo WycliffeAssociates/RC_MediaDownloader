@@ -1,12 +1,12 @@
 package org.wycliffeassociates.rcmediadownloader.io
 
+import java.io.BufferedInputStream
+import java.io.File
+import java.io.FileOutputStream
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import okhttp3.ResponseBody
 import org.slf4j.LoggerFactory
-import java.io.BufferedInputStream
-import java.io.File
-import java.io.FileOutputStream
 
 class OkHttpDownloadClient : IDownloadClient {
     private val logger = LoggerFactory.getLogger(javaClass)
