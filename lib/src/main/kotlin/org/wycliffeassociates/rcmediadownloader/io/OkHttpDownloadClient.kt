@@ -10,9 +10,9 @@ import org.slf4j.LoggerFactory
 
 class OkHttpDownloadClient : IDownloadClient {
     private val logger = LoggerFactory.getLogger(javaClass)
+    private val client = OkHttpClient()
 
     override fun downloadFromUrl(url: String, outputDir: File): File? {
-        val client = OkHttpClient()
         val urlFile = File(url)
         val outputFile = outputDir.resolve(urlFile.name)
 
