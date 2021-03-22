@@ -48,5 +48,5 @@ Run the .jar executable file with the following arguments:
 **Example:**
 
 ```
-  java -jar rcmediadownloader.jar -rc <PathToRC> -pid <ProjectId> -md <MediaDivision> -mt <MediaTypes>
+  java -jar rcmediadownloader.jar -rc /path/to/rc -pid gen -md chapter -ch 10 -mt wav -o
 ```
