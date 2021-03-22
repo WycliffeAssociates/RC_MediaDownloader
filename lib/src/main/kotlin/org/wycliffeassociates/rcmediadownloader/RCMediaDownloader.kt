@@ -24,7 +24,7 @@ abstract class RCMediaDownloader(
         }
     }
 
-    private fun execute(rc: ResourceContainer): File {
+    private fun execute(rc: ResourceContainer, projectExclusive: Boolean): File {
         val mediaProject = rc.media?.projects?.firstOrNull {
             it.identifier == urlParams.projectId
         } ?: return rc.file
@@ -53,6 +53,9 @@ abstract class RCMediaDownloader(
             }
         }
 
+        if (projectExclusive) {
+            rc.media?.projects = listOf(mediaProject)
+        }
         rc.writeMedia()
         return rc.file
     }
@@ -76,6 +79,7 @@ abstract class RCMediaDownloader(
             rcFile: File,
             urlParams: MediaUrlParameter,
             downloadClient: IDownloadClient,
+            singleProject: Boolean = true,
             overwrite: Boolean = false
         ): File {
             val downloader: RCMediaDownloader = when (urlParams.mediaDivision) {
@@ -97,7 +101,7 @@ abstract class RCMediaDownloader(
             }
 
             ResourceContainer.load(rcOutputFile).use { rc ->
-                return downloader.execute(rc)
+                return downloader.execute(rc, projectExclusive = singleProject)
             }
         }
     }
