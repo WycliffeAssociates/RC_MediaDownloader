@@ -108,8 +108,8 @@ class DownloadMediaToRCTest {
 
         try {
             ResourceContainer.load(rcFile).use {
-                val isSingleProject = it.media?.projects?.single()?.identifier == projectId
-                assertTrue(isSingleProject)
+                val hasSingleProject = it.media?.projects?.single()?.identifier == projectId
+                assertTrue(hasSingleProject)
             }
         } finally {
             tempDir.deleteRecursively()
