@@ -97,7 +97,9 @@ abstract class RCMediaDownloader(
                 rcFile
             } else {
                 // create a new copy of the original RC file
-                val newRCFile = rcFile.parentFile.resolve(rcFile.nameWithoutExtension + "_updated." + rcFile.extension)
+                val newRCFile = rcFile.parentFile.resolve(
+                    rcFile.nameWithoutExtension + "_updated." + rcFile.extension
+                )
                 if (newRCFile.exists()) newRCFile.deleteRecursively()
                 newRCFile.apply {
                     rcFile.copyRecursively(
