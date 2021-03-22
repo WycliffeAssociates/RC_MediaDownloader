@@ -75,6 +75,12 @@ abstract class RCMediaDownloader(
     companion object {
         const val MEDIA_DIR = "media"
 
+        /**
+         * @param rcFile the resource container to be used for download.
+         * @param urlParams defines the information about the requested content.
+         * @param singleProject limits the media manifest to contain a maximum of 1 project.
+         * @param overwrite whether to create new resource container or overwrite the rcFile.
+         */
         fun download(
             rcFile: File,
             urlParams: MediaUrlParameter,
