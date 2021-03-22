@@ -31,26 +31,14 @@ class DownloadMediaToRCTest {
     fun testDownloadSingleChapter() {
         val chapterNumber = 1
         val tempDir = createTempDir("testRC")
-        val mockDownloadClient = mock(IDownloadClient::class.java)
-        `when`(mockDownloadClient.downloadFromUrl(anyString(), this.any(File::class.java)))
-            .thenReturn(
-                tempDir.resolve("en_nt_ulb_tit_c01.mp3").apply { createNewFile() }
-            )
-
-        val file = RCMediaDownloader.download(
-            getTestFile(rcFileName),
-            MediaUrlParameter(projectId, mediaDivision, listOf(mediaType), chapterNumber),
-            mockDownloadClient,
-            overwrite = false
-        )
-        verify(mockDownloadClient).downloadFromUrl(anyString(), this.any(File::class.java))
+        val file = executeDownloadOneChapter(chapterNumber, downloadDir = tempDir)
 
         val chapterUrl = getMediaUrl(file, projectId, mediaDivision, mediaType)
         if (chapterUrl.isNullOrEmpty()) {
             return fail("Chapter url not found")
         }
 
-//         check if entries contain the requested download files
+        // check if entries contain the requested download files
         var isExisting = false
         val pathInMediaManifest = chapterUrl.replace("{chapter}", chapterNumber.toString())
         ZipFile(file).use { rcZip ->
@@ -92,7 +80,7 @@ class DownloadMediaToRCTest {
             return fail("Chapter url not found")
         }
 
-//         check if entries contain the requested download files
+        // check if entries contain the requested download files
         var isMissingChapter = false
         ZipFile(file).use { rcZip ->
             val listEntries = rcZip.entries().toList()
@@ -113,6 +101,44 @@ class DownloadMediaToRCTest {
         assertFalse(isMissingChapter)
     }
 
+    @Test
+    fun `test Media Manifest with a single Project`() {
+        val tempDir = createTempDir("testRC")
+        val rcFile = executeDownloadOneChapter(chapterNumber = 1, downloadDir = tempDir)
+
+        try {
+            ResourceContainer.load(rcFile).use {
+                val isSingleProject = it.media?.projects?.single()?.identifier == projectId
+                assertTrue(isSingleProject)
+            }
+        } finally {
+            tempDir.deleteRecursively()
+            rcFile.deleteRecursively()
+        }
+    }
+
+    private fun executeDownloadOneChapter(
+        chapterNumber: Int,
+        downloadDir: File
+    ): File {
+        val mockDownloadClient = mock(IDownloadClient::class.java)
+        `when`(mockDownloadClient.downloadFromUrl(anyString(), this.any(File::class.java)))
+            .thenReturn(
+                downloadDir.resolve("en_ulb_tit_c1.mp3").apply { createNewFile() }
+            )
+
+        val file = RCMediaDownloader.download(
+            getTestFile(rcFileName),
+            MediaUrlParameter(projectId, mediaDivision, listOf(mediaType), chapterNumber),
+            mockDownloadClient,
+            singleProject = true,
+            overwrite = false
+        )
+        verify(mockDownloadClient).downloadFromUrl(anyString(), this.any(File::class.java))
+
+        return file
+    }
+
     private fun <T> any(type: Class<T>): T = Mockito.any(type)
 
     @Throws(FileNotFoundException::class)
@@ -126,9 +152,9 @@ class DownloadMediaToRCTest {
 
     private fun defaultMediaFile(url: String, tempDir: File): File? {
         val defaultFileNames = arrayOf(
-            "en_nt_ulb_tit_c01.mp3",
-            "en_nt_ulb_tit_c02.mp3",
-            "en_nt_ulb_tit_c03.mp3"
+            "en_ulb_tit_c1.mp3",
+            "en_ulb_tit_c2.mp3",
+            "en_ulb_tit_c3.mp3"
         )
 
         return if (File(url).name in defaultFileNames) {
