@@ -31,7 +31,7 @@ class DownloadMediaToRCTest {
     fun testDownloadSingleChapter() {
         val chapterNumber = 1
         val tempDir = createTempDir("testRC")
-        val file = executeDownloadOneChapter(chapterNumber, downloadDir = tempDir)
+        val file = executeDownloadOneChapter(chapterNumber, tempDir, singleProject = false)
 
         val chapterUrl = getMediaUrl(file, projectId, mediaDivision, mediaType)
         if (chapterUrl.isNullOrEmpty()) {
@@ -104,7 +104,9 @@ class DownloadMediaToRCTest {
     @Test
     fun `test Media Manifest with a single Project`() {
         val tempDir = createTempDir("testRC")
-        val rcFile = executeDownloadOneChapter(chapterNumber = 1, downloadDir = tempDir)
+        val rcFile = executeDownloadOneChapter(
+            chapterNumber = 1, downloadDir = tempDir, singleProject = true
+        )
 
         try {
             ResourceContainer.load(rcFile).use {
@@ -119,7 +121,8 @@ class DownloadMediaToRCTest {
 
     private fun executeDownloadOneChapter(
         chapterNumber: Int,
-        downloadDir: File
+        downloadDir: File,
+        singleProject: Boolean
     ): File {
         val mockDownloadClient = mock(IDownloadClient::class.java)
         `when`(mockDownloadClient.downloadFromUrl(anyString(), this.any(File::class.java)))
@@ -131,7 +134,7 @@ class DownloadMediaToRCTest {
             getTestFile(rcFileName),
             MediaUrlParameter(projectId, mediaDivision, listOf(mediaType), chapterNumber),
             mockDownloadClient,
-            singleProject = true,
+            singleProject = singleProject,
             overwrite = false
         )
         verify(mockDownloadClient).downloadFromUrl(anyString(), this.any(File::class.java))
