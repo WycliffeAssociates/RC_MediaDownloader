@@ -37,6 +37,11 @@ class CIApplication : CliktCommand() {
         help = "Overwrite the original resource container."
     ).flag()
 
+    private val singleProject: Boolean by option(
+        "-sp", "--singleProject",
+        help = "Output media manifest contains maximum 1 project."
+    ).flag()
+
     private val mediaTypes by option(
         "-mt", "--mediatypes",
         help = "List of media types to download, separated by commas ','. Example: wav,png"
@@ -61,7 +66,13 @@ class CIApplication : CliktCommand() {
             !mediaTypeList.any() -> System.err.println("Invalid media type(s)")
             else -> {
                 val urlParameter = MediaUrlParameter(projectId, division, mediaTypeList, chapter)
-                val resultFile = RCMediaDownloader.download(rcFile, urlParameter, OkHttpDownloadClient(), overwrite)
+                val resultFile = RCMediaDownloader.download(
+                    rcFile,
+                    urlParameter,
+                    OkHttpDownloadClient(),
+                    singleProject = singleProject,
+                    overwrite = overwrite
+                )
                 println("Process completed! Check your file at $resultFile")
             }
         }
