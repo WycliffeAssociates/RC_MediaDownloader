@@ -24,7 +24,7 @@ abstract class RCMediaDownloader(
         }
     }
 
-    private fun execute(rc: ResourceContainer): File {
+    private fun execute(rc: ResourceContainer, projectExclusive: Boolean): File {
         val mediaProject = rc.media?.projects?.firstOrNull {
             it.identifier == urlParams.projectId
         } ?: return rc.file
@@ -53,6 +53,9 @@ abstract class RCMediaDownloader(
             }
         }
 
+        if (projectExclusive) {
+            rc.media?.projects = listOf(mediaProject)
+        }
         rc.writeMedia()
         return rc.file
     }
@@ -72,10 +75,17 @@ abstract class RCMediaDownloader(
     companion object {
         const val MEDIA_DIR = "media"
 
+        /**
+         * @param rcFile the resource container to be used for download.
+         * @param urlParams defines the information about the requested content.
+         * @param singleProject limits the media manifest to contain a maximum of 1 project.
+         * @param overwrite whether to create new resource container or overwrite the rcFile.
+         */
         fun download(
             rcFile: File,
             urlParams: MediaUrlParameter,
             downloadClient: IDownloadClient,
+            singleProject: Boolean = true,
             overwrite: Boolean = false
         ): File {
             val downloader: RCMediaDownloader = when (urlParams.mediaDivision) {
@@ -87,7 +97,9 @@ abstract class RCMediaDownloader(
                 rcFile
             } else {
                 // create a new copy of the original RC file
-                val newRCFile = rcFile.parentFile.resolve(rcFile.nameWithoutExtension + "_updated." + rcFile.extension)
+                val newRCFile = rcFile.parentFile.resolve(
+                    rcFile.nameWithoutExtension + "_updated." + rcFile.extension
+                )
                 if (newRCFile.exists()) newRCFile.deleteRecursively()
                 newRCFile.apply {
                     rcFile.copyRecursively(
@@ -97,7 +109,7 @@ abstract class RCMediaDownloader(
             }
 
             ResourceContainer.load(rcOutputFile).use { rc ->
-                return downloader.execute(rc)
+                return downloader.execute(rc, projectExclusive = singleProject)
             }
         }
     }
