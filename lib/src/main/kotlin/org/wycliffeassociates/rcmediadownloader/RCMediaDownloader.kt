@@ -39,8 +39,13 @@ abstract class RCMediaDownloader(
                 when (urlParams.mediaDivision) {
                     MediaDivision.CHAPTER -> {
                         val url = media.chapterUrl
-                        if (validateUrl(url)) {
+                        if (true) {
+                            var startTime = System.currentTimeMillis()
+
                             media.chapterUrl = downloadMedia(url, rc)
+
+                            var endTime = System.currentTimeMillis()
+                            println("Download time: " + (endTime - startTime) + "ms")
                         }
                     }
                     else -> {
