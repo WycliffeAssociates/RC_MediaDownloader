@@ -9,7 +9,7 @@ import org.wycliffeassociates.rcmediadownloader.RCMediaDownloader
 import org.wycliffeassociates.rcmediadownloader.data.MediaDivision
 import org.wycliffeassociates.rcmediadownloader.data.MediaType
 import org.wycliffeassociates.rcmediadownloader.data.MediaUrlParameter
-import org.wycliffeassociates.rcmediadownloader.io.OkHttpDownloadClient
+import org.wycliffeassociates.rcmediadownloader.io.LocalTransferClient
 
 class CIApplication : CliktCommand() {
     private val rcPath by option(
@@ -66,13 +66,17 @@ class CIApplication : CliktCommand() {
             !mediaTypeList.any() -> System.err.println("Invalid media type(s)")
             else -> {
                 val urlParameter = MediaUrlParameter(projectId, division, mediaTypeList, chapter)
+                var startTime = System.currentTimeMillis()
+
                 val resultFile = RCMediaDownloader.download(
                     rcFile,
                     urlParameter,
-                    OkHttpDownloadClient(),
+                    LocalTransferClient(),
                     singleProject = singleProject,
                     overwrite = overwrite
                 )
+                var endTime = System.currentTimeMillis()
+                println("Total time lapse: " + (endTime - startTime) + "ms")
                 println("Process completed! Check your file at $resultFile")
             }
         }
