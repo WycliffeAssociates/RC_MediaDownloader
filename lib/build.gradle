@@ -13,18 +13,20 @@ plugins {
     id 'org.jlleitschuh.gradle.ktlint'
     id 'io.gitlab.arturbosch.detekt'
     id 'maven'
+    id 'maven-publish'
 }
 
 group = 'org.wycliffeassociates'
-version = '1.1.3'
+version = '1.2.0'
 
 repositories {
-    jcenter()
+    mavenCentral()
+    maven { url "https://nexus-registry.walink.org/repository/maven-public/"}
 }
 
 dependencies {
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_ver"
-    implementation "org.wycliffeassociates:kotlin-resource-container:0.7.0"
+    implementation "org.wycliffeassociates:kotlin-resource-container:$rc_lib_ver"
     implementation "com.squareup.retrofit2:retrofit:$retrofit_ver"
     implementation "com.squareup.okhttp3:okhttp:$okhttp_ver"
     implementation "org.slf4j:slf4j-api:$slf4j_api_ver"
@@ -35,29 +37,41 @@ dependencies {
     testImplementation group: 'junit', name: 'junit', version: '4.12'
 }
 
-uploadArchives {
-    repositories {
-        mavenDeployer {
-            repository(url: "${System.getenv("NEXUS_URL")}/repository/maven-releases") {
-                authentication(
-                        userName: System.getenv("NEXUS_USER"),
-                        password: System.getenv("NEXUS_PASSWORD")
-                )
-            }
-            snapshotRepository(url: "${System.getenv("NEXUS_URL")}/repository/maven-snapshots") {
-                authentication(
-                        userName: System.getenv("NEXUS_USER"),
-                        password: System.getenv("NEXUS_PASSWORD")
-                )
-            }
-            pom.artifactId = 'rcmediadownloader'
-            pom.project {
-                licenses {
-                    license {
-                        name 'MIT License'
-                        url 'https://raw.githubusercontent.com/WycliffeAssociates/RC_MediaDownloader/master/LICENSE'
-                        distribution 'repo'
+task sourceJar(type: Jar) {
+    archiveClassifier = "sources"
+    from('src/main/kotlin') {
+        include '**'
+    }
+}
+
+afterEvaluate {
+    publishing {
+        publications {
+            mavenRelease(MavenPublication) {
+                from components.kotlin
+                groupId = group
+                artifactId = "rcmediadownloader"
+                version = version
+                artifact sourceJar
+                pom {
+                    name = "rcmediadownloader"
+                    licenses {
+                        license {
+                            name = 'MIT License'
+                            url = ' https://raw.githubusercontent.com/WycliffeAssociates/kotlin-resource-container/dev/LICENSE'
+                            distribution = 'repo'
+                        }
                     }
+                }
+            }
+        }
+        repositories {
+            maven {
+                url = version.endsWith('SNAPSHOT') ? "${System.getenv("NEXUS_URL")}/repository/maven-snapshots/"
+                        : "${System.getenv("NEXUS_URL")}/repository/maven-releases/"
+                credentials {
+                    username = System.getenv("NEXUS_USER")
+                    password  = System.getenv("NEXUS_PASSWORD")
                 }
             }
         }
